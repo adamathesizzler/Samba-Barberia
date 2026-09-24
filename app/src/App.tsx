@@ -42,6 +42,7 @@ export function useTheme() {
 function DemoBar() {
   const { role, setRole, now, advance, reset } = useStore();
   const [open, setOpen] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   return (
     <div className="demo-bar glass" role="region" aria-label="Controles de demostración">
       <div className="inner">
@@ -69,16 +70,23 @@ function DemoBar() {
             <button onClick={() => advance(15)}>+15 min</button>
             <button onClick={() => advance(60)}>+1 h</button>
             <button onClick={() => advance(60 * 24)}>+1 día</button>
-            <button
-              onClick={() => {
-                if (confirm("¿Reiniciar la demostración? Se pierden los cambios hechos en este navegador.")) {
-                  reset();
-                  navigate(ROLES[role].home);
-                }
-              }}
-            >
-              Reiniciar demo
-            </button>
+            {confirmReset ? (
+              <>
+                <span>¿Borrar los cambios de esta demo?</span>
+                <button
+                  onClick={() => {
+                    reset();
+                    setConfirmReset(false);
+                    navigate(ROLES[role].home);
+                  }}
+                >
+                  Sí, reiniciar
+                </button>
+                <button onClick={() => setConfirmReset(false)}>No</button>
+              </>
+            ) : (
+              <button onClick={() => setConfirmReset(true)}>Reiniciar demo</button>
+            )}
           </>
         )}
       </div>

@@ -39,7 +39,7 @@ function useOwnAppointment(id: string) {
 export function AppointmentDetail({ id }: { id: string }) {
   const { state, actor, be, now, toast } = useStore();
   const a = useOwnAppointment(id);
-  const [sheet, setSheet] = useState<null | "gestionar" | "wallet" | "cambiar">(null);
+  const [sheet, setSheet] = useState<null | "gestionar" | "wallet" | "cambiar" | "calendario">(null);
   const [newTime, setNewTime] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const isNew = parseHash().query.get("nueva") === "1";
@@ -64,15 +64,14 @@ export function AppointmentDetail({ id }: { id: string }) {
   const title = `${a.services.map((s) => s.name).join(" + ")} con ${staff.name}`;
   const waitReq = state.waitlist.find((w) => w.originalAppointmentId === a.id && ["activa", "oferta_enviada"].includes(w.status));
 
-  const downloadIcs = () => {
-    const blob = new Blob([icsFor(a, `${loc.name}, ${loc.address}`, title)], { type: "text/calendar" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `reserva-${a.code}.ics`;
-    link.click();
-    URL.revokeObjectURL(url);
-    toast("Archivo de calendario descargado");
+  const ics = icsFor(a, `${loc.name}, ${loc.address}`, title);
+  const copyIcs = async () => {
+    try {
+      await navigator.clipboard.writeText(ics);
+      toast("Evento copiado");
+    } catch {
+      toast("No se pudo copiar; selecciona el texto");
+    }
   };
 
   return (
@@ -91,7 +90,7 @@ export function AppointmentDetail({ id }: { id: string }) {
             <button className="btn outline" onClick={() => setSheet("wallet")}>
               <Icon name="wallet" size={18} /> Wallet
             </button>
-            <button className="btn outline" onClick={downloadIcs}>
+            <button className="btn outline" onClick={() => setSheet("calendario")}>
               <Icon name="calendar" size={18} /> Calendario
             </button>
           </div>
@@ -192,6 +191,19 @@ export function AppointmentDetail({ id }: { id: string }) {
             }}
           >
             Abrir mi pase en la app
+          </button>
+        </Sheet>
+      )}
+
+      {sheet === "calendario" && (
+        <Sheet title="Añadir al calendario" onClose={() => setSheet(null)}>
+          <p className="small">
+            {capitalize(formatDay(a.start))}, de {timePart(a.start)} a {timePart(a.end)} · {title} · {loc.name}
+          </p>
+          <p className="xs muted">En la app instalada se descargará un archivo .ics. En esta vista previa puedes copiar el evento.</p>
+          <textarea className="textarea code xs" readOnly value={ics} rows={6} aria-label="Evento de calendario" onFocus={(e) => e.currentTarget.select()} />
+          <button className="btn primary block" onClick={copyIcs}>
+            Copiar evento
           </button>
         </Sheet>
       )}

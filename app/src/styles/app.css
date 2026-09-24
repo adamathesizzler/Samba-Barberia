@@ -754,7 +754,7 @@ p {
 
 .demo-bar {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 30;
   border-bottom: 1px solid var(--border);
   font-size: var(--fs-xs);
