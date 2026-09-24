@@ -5,7 +5,8 @@ import { Icon, type IconName } from "./Icon";
 
 /**
  * Marcador de fotografía de demostración. El prototipo no usa fotos reales de personas:
- * dibuja una silueta y la etiqueta para que no se confunda con un resultado real.
+ * dibuja un retrato de estudio en silueta (luz suave, niebla, borde iluminado) y lo etiqueta
+ * para que no se confunda con un resultado real.
  */
 export function PhotoArt({
   hue,
@@ -23,40 +24,90 @@ export function PhotoArt({
   style?: React.CSSProperties;
 }) {
   const gid = useId().replace(/:/g, "");
-  const side = view === "lateral_izq" ? -1 : view === "lateral_der" ? 1 : 0;
-  const back = view === "posterior";
-  const cx = 100 + side * 6;
   const tag = source === "simulacion_ia" ? "Simulación IA" : source === "referencia_externa" ? "Referencia externa" : label;
+  // Variante de corte según el tono: rapado con volumen, texturizado o rizado.
+  const cut = Math.abs(Math.round(hue)) % 3;
+  const bgTop = `hsl(${hue} 42% 74%)`;
+  const bgBottom = `hsl(${(hue + 25) % 360} 36% 36%)`;
+  const ink = `hsl(${hue} 18% 11%)`;
+  const rim = `hsl(${(hue + 30) % 360} 60% 88%)`;
+  const lateral = view === "lateral_izq" || view === "lateral_der";
+  const flip = view === "lateral_izq" ? "translate(200 0) scale(-1 1)" : undefined;
+  const zoom = view === "detalle" ? "translate(-110 -40) scale(1.9)" : undefined;
+
+  const hair =
+    cut === 0
+      ? "M80 104 C74 70 98 50 128 52 C148 54 158 68 154 86 C142 76 124 74 108 80 C96 86 90 96 88 110 Z"
+      : cut === 1
+        ? "M78 108 C70 74 90 46 126 46 C142 44 156 52 158 64 C150 62 152 72 158 80 C144 74 124 72 106 80 C94 86 88 98 86 112 Z"
+        : "M76 110 C66 90 72 58 98 50 C104 42 118 40 126 46 C136 40 150 46 150 56 C160 60 162 76 154 84 C140 76 122 74 106 80 C94 86 88 98 86 112 Z";
+
   return (
     <div className={`photo ${className}`} style={style}>
       <svg className="art" viewBox="0 0 200 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
-          <linearGradient id={`bg${gid}`} x1="0" y1="0" x2="0.4" y2="1">
-            <stop offset="0" stopColor={`hsl(${hue} 32% 74%)`} />
-            <stop offset="1" stopColor={`hsl(${(hue + 30) % 360} 28% 38%)`} />
+          <linearGradient id={`bg${gid}`} x1="0" y1="0" x2="0.3" y2="1">
+            <stop offset="0" stopColor={bgTop} />
+            <stop offset="1" stopColor={bgBottom} />
           </linearGradient>
-          <linearGradient id={`sk${gid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={`hsl(${(hue + 10) % 360} 30% 62%)`} />
-            <stop offset="1" stopColor={`hsl(${(hue + 10) % 360} 26% 48%)`} />
+          <radialGradient id={`glow${gid}`} cx="0.72" cy="0.28" r="0.6">
+            <stop offset="0" stopColor="#fff" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id={`fog${gid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0.55" stopColor={bgBottom} stopOpacity="0" />
+            <stop offset="1" stopColor={bgBottom} stopOpacity="0.55" />
           </linearGradient>
+          <linearGradient id={`fade${gid}`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor={ink} stopOpacity="0" />
+            <stop offset="1" stopColor={ink} stopOpacity="0.35" />
+          </linearGradient>
+          <filter id={`soft${gid}`} x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="0.9" />
+          </filter>
         </defs>
         <rect width="200" height="250" fill={`url(#bg${gid})`} />
-        <path d="M30 250c6-46 36-66 70-66s64 20 70 66z" fill={`hsl(${hue} 18% 22%)`} opacity="0.9" />
-        <rect x={cx - 15} y="150" width="30" height="40" rx="12" fill={`url(#sk${gid})`} />
-        <ellipse cx={cx} cy="118" rx={side ? 36 : 40} ry="50" fill={`url(#sk${gid})`} />
-        {side !== 0 && <ellipse cx={cx - side * 30} cy="122" rx="7" ry="11" fill={`hsl(${(hue + 10) % 360} 26% 52%)`} />}
-        <path
-          d={
-            back
-              ? `M${cx - 42} 125c-4-50 16-78 42-78s46 28 42 78c-6 24-18 40-42 40s-36-16-42-40z`
-              : `M${cx - 41} 112c-2-40 18-62 41-62s43 22 41 62c-4-16-10-24-14-27-10 6-44 6-58-2-4 4-8 12-10 29z`
-          }
-          fill={`hsl(${hue} 22% 14%)`}
-        />
-        <path d={`M${cx - 40} 118c2 14 4 20 6 24M${cx + 40} 118c-2 14-4 20-6 24`} stroke={`hsl(${hue} 18% 26%)`} strokeWidth="6" strokeLinecap="round" opacity="0.5" />
-        {!back && (
-          <path d={`M${cx - 26} 140c8 26 44 26 52 0 0 20-10 34-26 34s-26-14-26-34z`} fill={`hsl(${hue} 22% 16%)`} opacity="0.85" />
-        )}
+        <rect width="200" height="250" fill={`url(#glow${gid})`} />
+        <g transform={zoom}>
+          <g transform={flip} filter={`url(#soft${gid})`}>
+            {lateral ? (
+              <>
+                {/* Perfil: nuca, frente, nariz, labios, mentón y hombros */}
+                <path
+                  d="M80 150 C70 128 68 100 80 82 C92 64 116 58 134 66 C146 72 150 86 148 98 L155 112 L148 116 C150 121 150 125 146 128 C149 134 146 140 140 144 C134 148 128 150 124 154 L127 176 C152 184 172 198 180 250 L18 250 C24 206 50 190 76 180 C80 172 81 160 80 150 Z"
+                  fill={ink}
+                />
+                <path d={hair} fill={ink} />
+                {/* Degradado del lateral: la zona rapada se ve más clara */}
+                <path d="M82 112 C80 128 82 140 86 150 L112 148 C108 134 104 120 102 108 Z" fill={`url(#fade${gid})`} opacity="0.9" />
+                <path d="M80 150 C70 128 68 100 80 82 C92 64 116 58 134 66" fill="none" stroke={rim} strokeWidth="1.4" opacity="0.8" />
+              </>
+            ) : (
+              <>
+                <path d="M100 176 C130 178 170 196 178 250 L22 250 C30 196 70 178 100 176 Z" fill={ink} />
+                <path d="M86 150 L86 180 L114 180 L114 150 Z" fill={ink} />
+                <ellipse cx="100" cy="116" rx="36" ry="46" fill={ink} />
+                <ellipse cx="64" cy="118" rx="6" ry="10" fill={ink} />
+                <ellipse cx="136" cy="118" rx="6" ry="10" fill={ink} />
+                <path
+                  d={
+                    cut === 0
+                      ? "M62 112 C58 72 78 58 100 58 C124 58 144 72 138 112 C132 92 118 84 100 84 C82 84 68 92 62 112 Z"
+                      : cut === 1
+                        ? "M62 110 C56 66 80 50 104 52 C128 52 146 70 138 110 C134 90 126 80 116 76 C104 84 84 84 74 88 C68 94 64 102 62 110 Z"
+                        : "M60 112 C52 84 62 56 86 52 C94 44 110 44 118 50 C132 48 146 60 144 78 C150 90 144 104 140 112 C134 94 118 86 100 86 C82 86 66 94 60 112 Z"
+                  }
+                  fill={ink}
+                />
+                {view !== "posterior" && (
+                  <path d="M86 138 C92 146 108 146 114 138" fill="none" stroke={rim} strokeWidth="1" opacity="0.35" />
+                )}
+                <path d="M64 112 C62 80 80 60 100 60 C120 60 138 80 136 112" fill="none" stroke={rim} strokeWidth="1.3" opacity="0.7" />
+              </>
+            )}
+          </g>
+        </g>
+        <rect width="200" height="250" fill={`url(#fog${gid})`} />
       </svg>
       {tag && <span className="demo-tag">{tag}</span>}
     </div>

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { navigate, useRoute } from "./app/router";
 import { ROLES, useStore, type RoleKey } from "./app/store";
 import { datePart, formatDay, timePart } from "./domain/time";
 import { upcomingAppointments } from "./domain/queries";
 import { Icon, type IconName } from "./ui/Icon";
 import { Home } from "./screens/cliente/Home";
+import { Welcome, welcomeSeen } from "./screens/cliente/Welcome";
 import { Explore, ExploreDetail } from "./screens/cliente/Explore";
 import { Booking } from "./screens/cliente/Booking";
 import { AppointmentDetail, Pass } from "./screens/cliente/Appointment";
@@ -104,8 +105,8 @@ function ClientNav({ current }: { current: string }) {
   ];
   const next = actor.kind === "cliente" ? upcomingAppointments(state, actor.customerId, now)[0] : undefined;
   // Banda contextual (R08): solo el día de la cita y si aporta algo.
-  const showBand = next && datePart(next.start) === datePart(now) && current !== "pase" && current !== "reservar";
-  const hideNav = ["reservar", "pase"].includes(current);
+  const showBand = next && datePart(next.start) === datePart(now) && !["pase", "reservar", "inicio", "bienvenida"].includes(current);
+  const hideNav = ["reservar", "pase", "bienvenida"].includes(current);
   if (hideNav) return null;
   return (
     <nav className="bottom" aria-label="Navegación principal">
@@ -127,20 +128,23 @@ function ClientNav({ current }: { current: string }) {
         </div>
       )}
       <div className="nav-row">
-        <div className="nav glass">
-          {items.slice(0, 4).map((it) => (
-            <a key={it.key} href={`#/cliente/${it.key}`} aria-current={current === it.key ? "page" : undefined}>
-              <Icon name={it.icon} size={20} />
-              {it.label}
-            </a>
+        <div className="nav glass orbnav">
+          {items.map((it, i) => (
+            <Fragment key={it.key}>
+              {i === 2 && (
+                <span className="orb-slot">
+                  <a className="orb" href="#/cliente/reservar" aria-label="Reservar">
+                    <Icon name="plus" size={26} strokeWidth={2.4} />
+                  </a>
+                </span>
+              )}
+              <a href={`#/cliente/${it.key}`} aria-current={current === it.key ? "page" : undefined}>
+                <Icon name={it.icon} size={20} />
+                {it.label}
+              </a>
+            </Fragment>
           ))}
         </div>
-        <a className="fab" href="#/cliente/reservar" aria-label="Reservar">
-          <div style={{ display: "grid", placeItems: "center" }}>
-            <Icon name="plus" size={22} strokeWidth={2.2} />
-            <span>Reservar</span>
-          </div>
-        </a>
       </div>
     </nav>
   );
@@ -181,7 +185,8 @@ export default function App() {
   const expected = actor.kind === "cliente" ? "cliente" : "pro";
   useEffect(() => {
     const allowed = expected === "cliente" ? area === "cliente" : area === "pro" || (area === "gestion" && role === "propietaria");
-    if (!allowed) navigate(ROLES[role].home);
+    // La primera vez que entra un cliente ve la bienvenida.
+    if (!allowed) navigate(role === "cliente" && !welcomeSeen() ? "/cliente/bienvenida" : ROLES[role].home);
   }, [area, expected, role]);
 
   let content: React.ReactNode = null;
@@ -189,6 +194,7 @@ export default function App() {
     content =
       {
         inicio: <Home />,
+        bienvenida: <Welcome />,
         explorar: id ? <ExploreDetail photoId={id} /> : <Explore />,
         reservar: <Booking query={query} />,
         cita: <AppointmentDetail id={id} />,

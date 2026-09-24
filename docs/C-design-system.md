@@ -89,3 +89,29 @@ No se usan fotos de personas reales ni las de las referencias. `PhotoArt` dibuja
 ## Validación pendiente (§62)
 
 Las cuatro escenas de control (Home con foto, ficha del barbero, formulario de reserva y ticket) están implementadas en claro y oscuro. Falta: revisión con texto ampliado al 200 %, tableta y escritorio con distribución propia, y valoración del acento de marca cuando exista nombre/logo.
+
+## Referencias adicionales R11–R13 (24/09/2026)
+
+Aportadas por el promotor como inspiración para adaptar, no para copiar.
+
+| Ref. | Qué es | Qué se toma | Qué no se toma |
+|---|---|---|---|
+| **R11** | Perfil con foto a pantalla completa que se funde en oscuro | Foto de fondo que se difumina hacia el fondo de la página; nombre grande centrado; botón de pastilla principal junto a uno redondo; tres cifras en fila; tarjeta translúcida de presentación; galería debajo | Seguidores, «Follow», chat. Las cifras son visitas, estilos y recompensas; la tarjeta resume las preferencias confirmadas |
+| **R12** | Galería con foto de cabecera que se desvanece en blanco | Cabecera fotográfica con máscara degradada; fecha grande con el año en gris; botones de cristal en pastilla; título de sección con recuento a la derecha; cuadrícula de 3 columnas con piezas redondeadas y separación; navegación flotante | Acciones de «Clean» o limpieza automática |
+| **R13** | App de citas (happn): bienvenida, inicio y mapa | Fondo aéreo con degradados suaves; saludo con avatar y pastillas a la derecha; fichas de categoría con relieve; tarjeta de foto grande con botones de cristal en el lateral y etiquetas abajo; datos breves en tres fichas; botón central en forma de esfera; bienvenida con titular grande y botón negro con flecha | Mapa de personas cercanas, porcentajes de afinidad, «me gusta». El fondo usa tonos melocotón y azul pálido, en coherencia con el acento terracota decidido |
+
+### Dónde se aplica
+
+- **Bienvenida** (`#/cliente/bienvenida`, pantalla 01): R13. Se muestra la primera vez; se puede volver a ver desde Ajustes.
+- **Inicio**: R13. Saludo, fichas de categoría que abren la reserva con ese servicio, próxima cita como tarjeta fotográfica con QR / Preparar / Reserva y datos breves (días desde el último corte, visitas con su barbero, ritmo; «—» si no hay datos suficientes).
+- **Perfil**: R11.
+- **Historial**: cabecera R12 con la última visita.
+- **Navegación del cliente**: pastilla flotante con esfera central «Reservar» (R13), que sustituye al botón separado de R07 manteniendo los mismos cinco destinos.
+
+### Tokens nuevos
+
+`--ground-1`, `--ground-2` (fondo aéreo) y `--orb-1`, `--orb-2` (esfera), definidos en claro y oscuro. Componentes: `.glass-round` y `.chip-glass` (cristal oscuro para ir sobre foto), `.glass-pill`, `.cat`, `.photo-card`, `.facts`, `.profile-hero`, `.fade-hero`, `.orb`, `.welcome`, `.cta-arrow`.
+
+### Fotos de demostración
+
+`PhotoArt` pasa a dibujar retratos de estudio en silueta (luz suave, borde iluminado, perfil o frente, tres tipos de corte) con más contraste de color. Siguen etiquetados «Foto demo»; en cabeceras la etiqueta va arriba para no tapar el contenido.

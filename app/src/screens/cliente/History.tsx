@@ -40,9 +40,35 @@ export function History({ tab }: { tab: string }) {
     return session?.services.some((l) => st.cats!.includes(state.services.find((x) => x.id === l.serviceId)?.category ?? "corte"));
   });
 
+  const last = sessions[0];
+  const lastEntry = last && entries.find((e) => e.sessionId === last.id);
+  const heroPhoto = lastEntry?.coverPhotoId ? state.photos.find((p) => p.id === lastEntry.coverPhotoId) : undefined;
+  const [day, month, year] = last ? formatDate(last.completedAt).split(" ") : [];
+
   return (
     <div className="page">
-      <PageHeader title="Historial" />
+      {last && heroPhoto ? (
+        <header className="fade-hero">
+          <PhotoArt hue={heroPhoto.hue} view={heroPhoto.view} label={null} />
+          <div className="top-actions">
+            <span className="glass-pill">Historial</span>
+            <span className="glass-pill">{sessions.length} visitas</span>
+          </div>
+          <div className="big-date">
+            <div className="xs muted" style={{ fontWeight: 600, letterSpacing: "0.04em", marginBottom: 6 }}>
+              ÚLTIMA VISITA
+            </div>
+            {day} {month.slice(0, 3)} <span>{year}</span>
+          </div>
+          {lastEntry && (
+            <button className="glass-pill" onClick={() => navigate(`/cliente/reservar?repetir=${lastEntry.id}`)}>
+              Repetir <Icon name="sparkle" size={16} />
+            </button>
+          )}
+        </header>
+      ) : (
+        <PageHeader title="Historial" />
+      )}
       <div className="segmented" role="tablist">
         <button role="tab" aria-selected={tab === "visitas"} onClick={() => navigate("/cliente/historial?tab=visitas")}>
           Visitas

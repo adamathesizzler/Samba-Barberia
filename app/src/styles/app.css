@@ -1180,3 +1180,553 @@ button.list-item {
     transition-duration: 1ms !important;
   }
 }
+
+/* =========================================================
+   Lenguaje visual v2 (referencias R11–R13, ver docs/C):
+   fondo aéreo, fotos protagonistas que se funden con el fondo,
+   cristal sobre foto, fichas con relieve y esfera central.
+   ========================================================= */
+
+body {
+  background:
+    radial-gradient(120% 60% at 15% -10%, var(--ground-1) 0%, transparent 60%),
+    radial-gradient(90% 50% at 110% 10%, var(--ground-2) 0%, transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* Cuadrícula de fotos: piezas redondeadas con aire (R12) */
+.grid-photos {
+  gap: 8px;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.grid-photos > * {
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: none;
+  box-shadow: var(--shadow-1);
+}
+
+.section-count {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Botón redondo de cristal para usar sobre fotografía */
+.glass-round {
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(18, 16, 15, 0.32);
+  color: #fff;
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  flex-shrink: 0;
+}
+
+.glass-pill {
+  min-height: 40px;
+  padding: 0 var(--s4);
+  border-radius: var(--r-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: var(--shadow-1);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.glass-pill.icon {
+  width: 40px;
+  padding: 0;
+  justify-content: center;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-round {
+    background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-pill {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Cabecera de Inicio (R13) */
+.home-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding-top: var(--s2);
+}
+
+.home-head .avatar {
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 0 0 3px var(--surface);
+}
+
+/* Fichas de categoría con relieve (R13) */
+.cat-row {
+  display: flex;
+  gap: var(--s3);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 2px 8px;
+  margin: -4px -2px -8px;
+}
+
+.cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 64px;
+  border: 0;
+  background: none;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.cat .tile {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(150deg, hsl(var(--h) 70% 68%), hsl(var(--h) 60% 42%));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -6px 12px rgba(0, 0, 0, 0.18),
+    0 8px 16px -6px hsl(var(--h) 60% 40% / 0.55);
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.cat:active .tile {
+  transform: scale(0.94);
+}
+
+/* Tarjeta de cita con foto y controles de cristal (R13) */
+.photo-card {
+  position: relative;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  max-height: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-2);
+  color: #fff;
+  isolation: isolate;
+}
+
+.photo-card > .photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.photo-card::after {
+  content: "";
+  position: absolute;
+  inset: 40% 0 0 0;
+  background: linear-gradient(180deg, transparent, rgba(12, 10, 9, 0.72));
+  z-index: -1;
+}
+
+.photo-card .top {
+  position: absolute;
+  top: var(--s4);
+  left: var(--s4);
+  right: var(--s4);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.photo-card .side {
+  position: absolute;
+  right: var(--s4);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.photo-card .bottom {
+  position: absolute;
+  left: var(--s5);
+  right: 76px;
+  bottom: var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.photo-card .when {
+  font-size: var(--fs-3xl);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+}
+
+.chip-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: #fff;
+  background: rgba(18, 16, 15, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.photo-card .side .label {
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 2px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Datos breves en fila (R13 «200 m · 2 encuentros») */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s2);
+}
+
+.fact {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fact b {
+  font-size: var(--fs-md);
+  font-variant-numeric: tabular-nums;
+}
+
+.fact span {
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+}
+
+/* Perfil a pantalla completa (R11) */
+.profile-hero {
+  position: relative;
+  margin: calc(-1 * var(--s4)) calc(-1 * var(--s4)) 0;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  isolation: isolate;
+}
+
+.profile-hero > .photo {
+  position: absolute;
+  inset: 0 0 18% 0;
+  z-index: -2;
+}
+
+.profile-hero::before {
+  content: "";
+  position: absolute;
+  inset: 30% 0 0 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--bg) 55%, transparent) 35%, var(--bg) 75%);
+  -webkit-backdrop-filter: blur(0.5px);
+}
+
+.profile-hero .hero-actions {
+  position: absolute;
+  top: var(--s4);
+  left: var(--s4);
+  right: var(--s4);
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile-hero .content {
+  padding: 0 var(--s5) var(--s2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--s3);
+}
+
+.profile-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  padding: var(--s2) 0;
+}
+
+.profile-stats .stat {
+  align-items: center;
+}
+
+.profile-stats .stat b {
+  font-size: var(--fs-2xl);
+  font-variant-numeric: tabular-nums;
+}
+
+.bio {
+  width: 100%;
+  text-align: left;
+  padding: var(--s3) var(--s4);
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+}
+
+/* Cabecera fotográfica que se funde (R12): historial */
+.fade-hero {
+  position: relative;
+  margin: calc(-1 * var(--s4)) calc(-1 * var(--s4)) 0;
+  height: 330px;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 var(--s4) var(--s3);
+  gap: var(--s3);
+}
+
+.fade-hero > .photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+}
+
+.fade-hero .big-date {
+  font-size: var(--fs-3xl);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  flex: 1;
+}
+
+.fade-hero .big-date span {
+  color: var(--text-3);
+}
+
+.fade-hero .top-actions {
+  position: absolute;
+  top: var(--s4);
+  left: var(--s4);
+  right: var(--s4);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+/* Navegación con esfera central (R13 adaptado a R07) */
+.nav.orbnav {
+  align-items: center;
+}
+
+.nav.orbnav .orb-slot {
+  flex: 0 0 72px;
+  display: grid;
+  place-items: center;
+}
+
+.orb {
+  width: 58px;
+  height: 58px;
+  margin-top: -22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  text-decoration: none;
+  background:
+    radial-gradient(60% 50% at 35% 28%, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(circle at 50% 60%, var(--orb-1), var(--orb-2) 78%);
+  box-shadow:
+    0 0 0 5px var(--surface),
+    0 10px 24px -6px color-mix(in srgb, var(--orb-2) 70%, transparent),
+    inset 0 -6px 12px rgba(0, 0, 0, 0.25);
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.orb:active {
+  transform: scale(0.94);
+}
+
+.nav.orbnav a:not(.orb) {
+  background: none;
+}
+
+.nav.orbnav a[aria-current="page"]:not(.orb) {
+  color: var(--text);
+  background: none;
+}
+
+.nav.orbnav a[aria-current="page"]:not(.orb) svg {
+  stroke-width: 2.4;
+}
+
+.nav.orbnav a[aria-current="page"]:not(.orb)::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 1px;
+}
+
+/* Bienvenida (R13 izquierda) */
+.welcome {
+  position: relative;
+  min-height: calc(100dvh - 60px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.welcome > .photo {
+  position: absolute;
+  inset: 0 0 180px 0;
+  z-index: -2;
+}
+
+.welcome .brand {
+  position: absolute;
+  top: var(--s6);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.25);
+}
+
+.welcome .headline {
+  position: absolute;
+  top: 18%;
+  left: var(--s5);
+  right: var(--s5);
+  font-size: clamp(2.6rem, 12vw, 4rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  color: #fff;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+  text-wrap: balance;
+}
+
+.welcome .panel {
+  margin: 0 var(--s3) var(--s3);
+  padding: var(--s6) var(--s5) var(--s5);
+  border-radius: var(--r-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--s3);
+}
+
+.welcome .panel h2 {
+  font-size: var(--fs-xl);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.cta-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s4);
+  width: 100%;
+  max-width: 320px;
+  min-height: 60px;
+  padding: 6px var(--s6) 6px 6px;
+  border-radius: var(--r-full);
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-weight: 650;
+  font-size: var(--fs-md);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.45);
+}
+
+.cta-arrow .knob {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: #111;
+}
+
+.cta-arrow span:last-child {
+  flex: 1;
+  text-align: center;
+}
+
+/* Etiqueta «Foto demo» arriba en las cabeceras, lejos del contenido superpuesto */
+.profile-hero .demo-tag,
+.welcome .demo-tag,
+.fade-hero .demo-tag,
+.photo-card .demo-tag {
+  top: 72px;
+  bottom: auto;
+  left: 16px;
+}
+
+/* Sombra superior para que los controles sobre foto se lean siempre */
+.photo-card::before,
+.welcome::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 55% 0;
+  background: linear-gradient(180deg, rgba(12, 10, 9, 0.35), transparent);
+  z-index: -1;
+}
