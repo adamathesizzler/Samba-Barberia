@@ -1,6 +1,6 @@
 # F · Arquitectura técnica propuesta
 
-> **Estado: propuesta.** La tecnología, la plataforma inicial y los proveedores siguen pendientes de decisión del promotor (§61, §67). Nada de lo siguiente se ha contratado ni desplegado.
+> **Estado:** la plataforma inicial está **decidida: web instalable (PWA)** (24/09/2026). El proveedor de backend y el resto de la pila siguen siendo propuesta (§61, §67). Nada se ha contratado ni desplegado.
 
 ## Qué existe hoy
 

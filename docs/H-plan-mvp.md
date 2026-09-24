@@ -2,7 +2,7 @@
 
 Se parte del prototipo: el dominio y las pantallas ya existen, y el MVP las conecta a datos reales. Cada tarea termina con una **verificación** comprobable. El orden sigue el §58: primero el recorrido completo con una barbería, un profesional y pocos servicios, y después el resto del CORE.
 
-**Prerrequisito:** aprobar la plataforma y el proveedor (I-D1, I-D2). Sin esa aprobación no se crea infraestructura.
+**Prerrequisito:** plataforma ya decidida (PWA, I-D1); falta aprobar el proveedor de backend (I-D2). Sin esa aprobación no se crea infraestructura.
 
 ## Hito 0 · Cimientos
 

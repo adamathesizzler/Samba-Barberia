@@ -1,15 +1,24 @@
 # I · Riesgos y decisiones pendientes
 
+## Decisiones tomadas por el promotor (24/09/2026)
+
+| # | Decisión | Elegido |
+|---|---|---|
+| D1 | Plataforma inicial | **Web instalable (PWA)** para cliente, barbero y propietario (opción 1 de F) |
+| D4 | Color de acento | **Terracota** (`--accent` actual), sobre base blanco roto / grafito |
+| D6 | Programa de fidelización inicial | **10 visitas atendidas → 1 corte incluido, válido 90 días** |
+| D3 | Nombre comercial | **Aún sin decidir**: se mantiene «Samba» como provisional |
+
 ## Decisiones pendientes del promotor
 
 | # | Decisión | Por qué bloquea | Propuesta provisional |
 |---|---|---|---|
-| D1 | **Plataforma inicial** (PWA, nativa o ambas) | Determina el stack del MVP | PWA única (ver F) |
+| D1 | ~~Plataforma inicial~~ | — | **Decidido: PWA** |
 | D2 | **Proveedor de backend** y región de datos | Coste y tratamiento de datos | Supabase en la UE, a validar |
 | D3 | **Nombre comercial** | Dominio, pases Wallet, textos | Se usa «Samba» como **nombre de trabajo** porque es el nombre del repositorio. No está aprobado. |
-| D4 | **Color de marca / logo** | Tokens `--accent` | Terracota provisional, configurable por negocio |
+| D4 | Logo (color **decidido: terracota**) | Identidad | Pendiente de nombre |
 | D5 | Reglas de **cancelación, cambios, señales y ausencias** | Ticket, gestión de cita | Sin reglas; el prototipo lo indica |
-| D6 | **Programa de fidelización** (unidad, meta, premio, vigencia, compatibilidad) | Recompensas reales | Demo: 10 visitas → Corte, 90 días |
+| D6 | Fidelización: **decidido 10 visitas → 1 corte, 90 días**; faltan exclusiones y compatibilidad con otras ventajas | Recompensas reales | — |
 | D7 | Regla de **lista de espera** (orden, caducidad de oferta) | Justicia entre clientes | Demo: orden de llegada, 30 min |
 | D8 | ¿Cuándo se puede **editar la preparación**? (límite antes de la cita) | Operación del local | Demo: hasta la llegada |
 | D9 | **Pertenencia del portfolio** cuando un profesional cambia de negocio | Derechos sobre fotos | Sin definir |
