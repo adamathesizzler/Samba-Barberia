@@ -1,0 +1,159 @@
+/* Design System — tokens semánticos (docs/C-design-system.md).
+   Valores propuestos, no una marca aprobada. El acento es configurable por establecimiento. */
+
+:root {
+  /* SF Pro en dispositivos Apple (como el diseño); Inter en el resto */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+
+  /* escala tipográfica */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.9375rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --fs-3xl: 2.25rem;
+
+  /* espaciado (base 4) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+
+  /* radios */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-full: 999px;
+
+  /* movimiento */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Curvas con carácter: salida fuerte para respuestas, cajón tipo iOS para hojas y pantallas */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Solo para soltar algo que se había presionado: un leve rebote */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 160ms;
+  --t-med: 280ms;
+
+  --tap: 44px;
+
+  /* tema claro · paleta del diseño v1.0 (Negro #0B0B0C, Gris oscuro #1C1C1E, Gris #8E8E93, Gris claro #D1D1D6,
+     Azul #3B82F6, Violeta #7C3AED, Glow #EDEBFF) */
+  --bg: #f2f3f7;
+  --surface: #ffffff;
+  --surface-2: #eeeff3;
+  --surface-3: #d1d1d6;
+  --text: #0b0b0c;
+  --text-2: #6e6e73;
+  --text-3: #8e8e93;
+  --border: rgba(11, 11, 12, 0.08);
+  --selected: #0b0b0c;
+  --on-selected: #ffffff;
+  --accent: #3b82f6;
+  --on-accent: #ffffff;
+  --violet: #7c3aed;
+  --glow: #edebff;
+  --success: #1f8a4c;
+  --success-bg: #e4f4ea;
+  --warning: #a15c00;
+  --warning-bg: #fdf0db;
+  --danger: #d0342c;
+  --danger-bg: #fde8e7;
+  --info-bg: #eef2ff;
+  --loyalty: #c9971c;
+  --loyalty-bg: #f7f1e1;
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --scrim: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.55) 100%);
+  --highlight: rgba(255, 255, 255, 0.8);
+  --ground-1: #e6e2ff;
+  --ground-2: #dde9ff;
+  --orb-1: #3a3a3c;
+  --orb-2: #0b0b0c;
+  --shadow-1: 0 1px 2px rgba(11, 11, 12, 0.05), 0 2px 8px rgba(11, 11, 12, 0.05);
+  --shadow-2: 0 4px 12px rgba(11, 11, 12, 0.07), 0 16px 36px rgba(11, 11, 12, 0.1);
+  --focus: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0b0c;
+    --surface: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --surface-3: #3a3a3c;
+    --text: #f5f5f7;
+    --text-2: #aeaeb2;
+    --text-3: #8e8e93;
+    --border: rgba(255, 255, 255, 0.09);
+    --selected: #f5f5f7;
+    --on-selected: #0b0b0c;
+    --accent: #60a5fa;
+    --on-accent: #0b0b0c;
+    --violet: #a78bfa;
+    --glow: #231f45;
+    --success: #5fd08f;
+    --success-bg: #10281a;
+    --warning: #f0b34a;
+    --warning-bg: #2c220e;
+    --danger: #ff7b72;
+    --danger-bg: #351614;
+    --info-bg: #181c33;
+    --loyalty: #e8b73a;
+    --loyalty-bg: #2a2413;
+    --glass: rgba(28, 28, 30, 0.68);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --highlight: rgba(255, 255, 255, 0.07);
+    --ground-1: #1d1838;
+    --ground-2: #0f1b33;
+    --orb-1: #3a3a3c;
+    --orb-2: #0b0b0c;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 8px 28px rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"],
+.theme-dark {
+  --bg: #0b0b0c;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --surface-3: #3a3a3c;
+  --text: #f5f5f7;
+  --text-2: #aeaeb2;
+  --text-3: #8e8e93;
+  --border: rgba(255, 255, 255, 0.09);
+  --selected: #f5f5f7;
+  --on-selected: #0b0b0c;
+  --accent: #60a5fa;
+  --on-accent: #0b0b0c;
+  --violet: #a78bfa;
+  --glow: #231f45;
+  --success: #5fd08f;
+  --success-bg: #10281a;
+  --warning: #f0b34a;
+  --warning-bg: #2c220e;
+  --danger: #ff7b72;
+  --danger-bg: #351614;
+  --info-bg: #181c33;
+  --loyalty: #e8b73a;
+  --loyalty-bg: #2a2413;
+  --glass: rgba(28, 28, 30, 0.68);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --highlight: rgba(255, 255, 255, 0.07);
+  --ground-1: #1d1838;
+  --ground-2: #0f1b33;
+  --orb-1: #3a3a3c;
+  --orb-2: #0b0b0c;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 8px 28px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
