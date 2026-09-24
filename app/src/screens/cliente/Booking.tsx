@@ -132,7 +132,7 @@ export function Booking({ query }: { query: URLSearchParams }) {
 
       {refPhoto && (
         <div className="row card tinted">
-          <PhotoArt hue={refPhoto.hue} view={refPhoto.view} label={null} style={{ width: 48, height: 60, borderRadius: 12, flexShrink: 0 }} />
+          <PhotoArt hue={refPhoto.hue} view={refPhoto.view} img={refPhoto.img} label={null} style={{ width: 48, height: 60, borderRadius: 12, flexShrink: 0 }} />
           <span className="small">Tu referencia irá con la reserva. Tu barbero confirmará la adaptación.</span>
         </div>
       )}
@@ -168,7 +168,7 @@ export function Booking({ query }: { query: URLSearchParams }) {
           ) : (
             staff && (
               <button className="barber-card" onClick={() => setPickBarber(true)} aria-label="Cambiar de barbero">
-                <Avatar name={staff.name} hue={staff.hue} />
+                <Avatar name={staff.name} hue={staff.hue} src={staff.photo} />
                 <span className="grow">
                   <b>Con {staff.name}</b>
                   <div className="xs muted">{staff.id === me.preferredStaffId ? "Tu barbero de siempre" : staff.specialties.join(" · ")}</div>
@@ -225,7 +225,7 @@ export function Booking({ query }: { query: URLSearchParams }) {
             ) : (
               <div className="card stack">
                 <b>Sin huecos de {duration} min este día</b>
-                <p className="small muted">Elige otro día o te avisamos si se libera algo. No toca ninguna otra cita tuya.</p>
+                <p className="small muted">Elige otro día o te avisamos si se libera algo.</p>
                 <div className="row">
                   <label className="field grow">
                     <span className="label">Desde</span>
@@ -295,7 +295,7 @@ export function Booking({ query }: { query: URLSearchParams }) {
                 {formatMoney(totalPrice(lines))}
               </b>
             </div>
-            <span className="xs muted">El pago se hace en el local; la app no cobra nada. Condiciones de cancelación pendientes de definir (demo).</span>
+            <span className="xs muted">Pagas en el local.</span>
           </section>
         </>
       )}
@@ -326,7 +326,7 @@ export function Booking({ query }: { query: URLSearchParams }) {
                     setPickBarber(false);
                   }}
                 >
-                  <Avatar name={s.name} hue={s.hue} />
+                  <Avatar name={s.name} hue={s.hue} src={s.photo} />
                   <span className="grow">
                     <b>{s.name}</b> {s.id === me.preferredStaffId && <span className="badge">Habitual</span>}
                     <div className="xs muted">{s.specialties.join(" · ")}</div>

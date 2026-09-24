@@ -22,7 +22,23 @@ export function demoToday(real = new Date()): string {
 }
 
 /** Sube cuando cambia la forma de los datos: la demo guardada en el navegador se regenera. */
-export const SEED_VERSION = 2;
+export const SEED_VERSION = 5;
+
+/** Fotos de muestra (Unsplash) para las subidas que se simulan en la demo. */
+export const DEMO_UPLOAD_POOL = ["cut-fade", "cut-top", "cut-barber", "cut-beard"];
+
+const NICO_POOL: Record<string, string[]> = {
+  frontal: ["nico", "cut-top", "cut-fade"],
+  lateral_izq: ["cut-barber", "cut-beard"],
+  lateral_der: ["shave", "cut-beard"],
+};
+const CUSTOMER_LOOKS: Record<string, string[]> = {
+  cli_alex: ["look-crop", "look-quiff"],
+  cli_marco: ["look-quiff", "look-smart"],
+  cli_samuel: ["look-classic", "look-side"],
+  cli_iker: ["look-curly-beard", "look-afro"],
+  cli_joel: ["look-buzz-beard", "look-beard"],
+};
 
 export const DEMO = {
   business: "biz_norte",
@@ -46,30 +62,30 @@ export function createSeed(now: string): DemoState {
   const s: DemoState = {
     version: SEED_VERSION,
     businesses: [
-      { id: DEMO.business, name: "Barbería Norte (demo)", isDemo: true },
-      { id: DEMO.otherBusiness, name: "Estudio Sur (demo)", isDemo: true },
+      { id: DEMO.business, name: "Barbería Norte", isDemo: true },
+      { id: DEMO.otherBusiness, name: "Estudio Sur", isDemo: true },
     ],
     locations: [
-      { id: DEMO.location, businessId: DEMO.business, name: "Norte · Centro", address: "Calle Ejemplo 12 (dirección ficticia)" },
-      { id: "loc_sur", businessId: DEMO.otherBusiness, name: "Sur · Mercado", address: "Plaza Demostración 3 (dirección ficticia)" },
+      { id: DEMO.location, businessId: DEMO.business, name: "Norte · Centro", address: "Calle Mayor 12" },
+      { id: "loc_sur", businessId: DEMO.otherBusiness, name: "Sur · Mercado", address: "Plaza del Mercado 3" },
     ],
     staff: [
       {
-        id: DEMO.david, businessId: DEMO.business, locationIds: [DEMO.location], name: "David", role: "barbero",
+        id: DEMO.david, photo: "staff-david", businessId: DEMO.business, locationIds: [DEMO.location], name: "David", role: "barbero",
         bio: "Degradados limpios y barbas con contorno natural.", specialties: ["Degradados", "Barba"], hue: 24,
         schedule: WEEK, bufferMin: 5, active: true,
       },
       {
-        id: DEMO.sara, businessId: DEMO.business, locationIds: [DEMO.location], name: "Sara", role: "barbero",
+        id: DEMO.sara, photo: "staff-sara", businessId: DEMO.business, locationIds: [DEMO.location], name: "Sara", role: "barbero",
         bio: "Color, texturas y trenzas.", specialties: ["Color", "Trenzas", "Tijera"], hue: 200,
         schedule: WEEK, bufferMin: 5, active: true,
       },
       {
-        id: DEMO.owner, businessId: DEMO.business, locationIds: [DEMO.location], name: "Marta", role: "propietario",
+        id: DEMO.owner, photo: "staff-marta", businessId: DEMO.business, locationIds: [DEMO.location], name: "Marta", role: "propietario",
         bio: "Propietaria.", specialties: [], hue: 320, schedule: {}, bufferMin: 0, active: true,
       },
       {
-        id: DEMO.leo, businessId: DEMO.otherBusiness, locationIds: ["loc_sur"], name: "Leo", role: "barbero",
+        id: DEMO.leo, photo: "staff-leo", businessId: DEMO.otherBusiness, locationIds: ["loc_sur"], name: "Leo", role: "barbero",
         bio: "Barbero en otro establecimiento de demostración.", specialties: ["Corte clásico"], hue: 140,
         schedule: WEEK, bufferMin: 5, active: true,
       },
@@ -94,11 +110,11 @@ export function createSeed(now: string): DemoState {
     exceptions: [],
     customers: [
       {
-        id: DEMO.customer, businessIds: [DEMO.business, DEMO.otherBusiness], name: "Nico Ferrer", phone: "600 000 000", hue: 28, guest: false,
+        id: DEMO.customer, businessIds: [DEMO.business, DEMO.otherBusiness], name: "Nico Ferrer", phone: "600 000 000", hue: 28, photo: "nico", guest: false,
         preferredStaffId: DEMO.david, sessionStyle: { tranquila: true, explicarCambios: false, consultarAntes: true }, savedPhotoIds: [],
       },
       ...["Alex", "Marco", "Samuel", "Iker", "Joel"].map((name, i) => ({
-        id: `cli_${name.toLowerCase()}`, businessIds: [DEMO.business], name: `${name} (demo)`, hue: 60 * i + 10, guest: false,
+        id: `cli_${name.toLowerCase()}`, businessIds: [DEMO.business], name, hue: 60 * i + 10, photo: CUSTOMER_LOOKS[`cli_${name.toLowerCase()}`][0], guest: false,
         sessionStyle: { tranquila: false, explicarCambios: false, consultarAntes: false },
         savedPhotoIds: [],
       })),
@@ -124,9 +140,9 @@ export function createSeed(now: string): DemoState {
     ],
     loyaltyPrograms: [
       {
-        businessId: DEMO.business, unit: "visitas", goal: 10, rewardName: "Corte incluido (demo)",
+        businessId: DEMO.business, unit: "visitas", goal: 10, rewardName: "Corte gratis",
         rewardBenefit: "Un servicio de Corte sin coste",
-        rewardConditions: "Solo el servicio Corte; extras aparte. Válido en Norte · Centro. Ejemplo de demostración, no condición comercial.",
+        rewardConditions: "Solo el servicio Corte; extras aparte. Válido en Norte · Centro.",
         validDays: 90,
       },
     ],
@@ -156,9 +172,13 @@ export function createSeed(now: string): DemoState {
   };
 
   const photo = (appt: Appointment, sessionId: string, view: PhotoView, hue: number, portfolio: boolean): Photo => {
+    const n = s.photos.length;
+    const pool = appt.customerId === DEMO.customer
+      ? appt.businessId === DEMO.otherBusiness ? ["look-bw"] : NICO_POOL[view] ?? NICO_POOL.frontal
+      : CUSTOMER_LOOKS[appt.customerId] ?? ["look-casual"];
     const p: Photo = {
       id: id("pho"), businessId: appt.businessId, customerId: appt.customerId, sessionId, appointmentId: appt.id,
-      view, source: "profesional", uploadedBy: appt.staffId, at: appt.end, hue, status: "subida",
+      view, source: "profesional", uploadedBy: appt.staffId, at: appt.end, hue, img: pool[n % pool.length], status: "subida",
     };
     s.photos.push(p);
     s.photoPermissions.push({ photoId: p.id, purpose: "historial_privado", granted: true, at: appt.end, by: "sistema" });
@@ -207,16 +227,17 @@ export function createSeed(now: string): DemoState {
     lastNicoSession = completed(appt, {
       title: titles[i % titles.length],
       photos: i % 6 === 0 ? 0 : i === 1 ? 3 : 2,
-      portfolio: i % 3 === 0,
+      // Solo un par de visitas de Nico autorizadas para el portfolio.
+      portfolio: i === 3 || i === 9,
       note: "Laterales a 1,5; transición baja; arriba solo repasar puntas.",
       maint: "Secar hacia atrás con los dedos. Cera mate, poca cantidad. Perfilar barba cada 10 días.",
-      sold: i === 4 ? [{ name: "Cera mate 75 ml (demo)", qty: 1, priceCents: 1400 }] : [],
+      sold: i === 4 ? [{ name: "Cera mate 75 ml", qty: 1, priceCents: 1400 }] : [],
     });
   }
   // Recompensa conseguida a las 10 visitas y ya utilizada.
   const tenth = s.sessions.filter((x) => x.customerId === DEMO.customer)[9];
   s.rewards.push({
-    id: "rew_used", businessId: DEMO.business, customerId: DEMO.customer, name: "Corte incluido (demo)", benefit: "Un servicio de Corte sin coste",
+    id: "rew_used", businessId: DEMO.business, customerId: DEMO.customer, name: "Corte gratis", benefit: "Un servicio de Corte sin coste",
     conditions: s.loyaltyPrograms[0].rewardConditions, origin: "10 visitas completadas", status: "utilizada", createdAt: tenth.completedAt,
     expiresAt: addDays(tenth.completedAt, 90), redeemCode: "R10001", redeemedAt: addDays(tenth.completedAt, 24), redeemedBy: DEMO.david,
   });
@@ -237,7 +258,7 @@ export function createSeed(now: string): DemoState {
     source: "web", qrToken: token(), createdAt: addDays(now, -65), history: [],
   };
   s.appointments.push(surAppt);
-  completed(surAppt, { title: "Corte clásico (Estudio Sur)", photos: 1 });
+  completed(surAppt, { title: "Corte clásico", photos: 1 });
 
   // --- Portfolio de otros clientes (fotos autorizadas para Explorar) ---
   const others = ["cli_alex", "cli_marco", "cli_samuel", "cli_iker", "cli_joel"];
@@ -246,7 +267,7 @@ export function createSeed(now: string): DemoState {
     const ids = staffId === DEMO.sara ? [["srv_color"], ["srv_trenzas"], ["srv_corte", "srv_trat"]][i % 3] : [["srv_degradado", "srv_barba"], ["srv_degradado"], ["srv_corte", "srv_barba"]][i % 3];
     const day = workday(addDays(now, -(8 + i * 5)));
     const appt = addAppt({ customerId: cid, staffId, start: `${datePart(day)}T${10 + i}:00`, services: svc(ids, staffId), status: "confirmada" });
-    completed(appt, { title: ["Burst fade + barba", "Platino", "Box braids", "Buzz cut", "Corte clásico + tratamiento"][i], photos: 2, portfolio: true });
+    completed(appt, { title: ["Textured crop", "Quiff clásico", "Corte clásico", "Rizos + barba", "Buzz cut + barba"][i], photos: 2, portfolio: true });
   });
 
   // --- Agenda de hoy (hora de demostración 10:00) ---

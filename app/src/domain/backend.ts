@@ -376,7 +376,7 @@ export class DemoBackend {
   /** Simula la subida. Una subida fallida queda marcada como tal y nunca se muestra como guardada. */
   uploadPhoto(
     actor: Actor,
-    input: { appointmentId: ID; view: PhotoView; source?: Photo["source"]; simulateFailure?: boolean },
+    input: { appointmentId: ID; view: PhotoView; source?: Photo["source"]; simulateFailure?: boolean; img?: string },
   ): Result<{ photo: Photo }> {
     const a = this.appt(input.appointmentId);
     if (!a || !canAccessAppointment(actor, a)) throw new PermissionError();
@@ -390,6 +390,7 @@ export class DemoBackend {
       uploadedBy: actor.kind === "cliente" ? actor.customerId : actor.staffId,
       at: this.now(),
       hue: Math.floor(Math.random() * 360),
+      img: input.img,
       status: input.simulateFailure ? "fallida" : "subida",
     };
     this.state.photos.push(photo);

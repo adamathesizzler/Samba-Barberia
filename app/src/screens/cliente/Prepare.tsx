@@ -102,7 +102,7 @@ export function Prepare({ id }: { id: string }) {
                   onClick={() => setStyleEntryId(e.id)}
                   style={{ outline: styleEntryId === e.id ? "3px solid var(--selected)" : undefined, outlineOffset: -3 }}
                 >
-                  <PhotoArt hue={p.hue} view={p.view} label={null} style={{ width: "100%", height: "100%" }} />
+                  <PhotoArt hue={p.hue} view={p.view} img={p.img} label={null} style={{ width: "100%", height: "100%" }} />
                 </button>
               );
             })}
@@ -111,7 +111,7 @@ export function Prepare({ id }: { id: string }) {
 
       {chosen && (
         <div className="card row">
-          {chosenPhoto && <PhotoArt hue={chosenPhoto.hue} view={chosenPhoto.view} label={null} style={{ width: 64, height: 80, borderRadius: 12 }} />}
+          {chosenPhoto && <PhotoArt hue={chosenPhoto.hue} view={chosenPhoto.view} img={chosenPhoto.img} label={null} style={{ width: 64, height: 80, borderRadius: 12 }} />}
           <div className="grow">
             <b>{chosen.title}</b>
             <div className="xs muted">{formatDay(state.sessions.find((s) => s.id === chosen.sessionId)!.completedAt)}</div>
@@ -123,7 +123,7 @@ export function Prepare({ id }: { id: string }) {
         <div className="card stack">
           {refPhoto ? (
             <div className="row">
-              <PhotoArt hue={refPhoto.hue} view={refPhoto.view} source={refPhoto.source} style={{ width: 64, height: 80, borderRadius: 12 }} />
+              <PhotoArt hue={refPhoto.hue} view={refPhoto.view} img={refPhoto.img} source={refPhoto.source} style={{ width: 64, height: 80, borderRadius: 12 }} />
               <span className="grow small">Referencia añadida para esta cita.</span>
               <button className="btn ghost sm" onClick={() => setRef(undefined)}>
                 Quitar
@@ -136,7 +136,7 @@ export function Prepare({ id }: { id: string }) {
                 <button
                   className="btn outline grow"
                   onClick={() => {
-                    const r = be.uploadPhoto(actor, { appointmentId: a.id, view: "frontal", source: "referencia_externa" });
+                    const r = be.uploadPhoto(actor, { appointmentId: a.id, view: "frontal", source: "referencia_externa", img: "look-quiff" });
                     if (r.ok) {
                       setRef(r.photo.id);
                       setUploadError(null);

@@ -85,7 +85,7 @@ export function Home() {
     <div className={`page ${firstVisit ? "stagger" : ""}`}>
       <section className="home-hero" aria-label="Inicio">
         <div className="parallax" ref={heroRef}>
-          <PhotoArt hue={heroPhoto?.hue ?? me.hue} view="lateral_der" label="Foto demo" />
+          <PhotoArt hue={heroPhoto?.hue ?? me.hue} view="lateral_der" img={me.photo ?? heroPhoto?.img} />
         </div>
         <div className="hello">
           <div className="who">
@@ -181,7 +181,7 @@ export function Home() {
               const p = state.photos.find((x) => x.id === e.coverPhotoId)!;
               return (
                 <button key={e.id} className="look-mini" onClick={(ev) => navigate(`/cliente/visita/${s.id}`, ev.currentTarget.querySelector<HTMLElement>(".photo"))}>
-                  <PhotoArt hue={p.hue} view={p.view} label={null} />
+                  <PhotoArt hue={p.hue} view={p.view} img={p.img} label={null} />
                   <span className="small" style={{ fontWeight: 650, lineHeight: 1.2 }}>
                     {e.title}
                   </span>
@@ -225,7 +225,7 @@ export function Home() {
               </span>
               <div>
                 <div className="xs muted">{available.length ? "Recompensa disponible" : "Próxima recompensa"}</div>
-                <b className="small">{loyalty.program.rewardName.replace(" (demo)", "")}</b>
+                <b className="small">{loyalty.program.rewardName}</b>
               </div>
             </div>
           </div>

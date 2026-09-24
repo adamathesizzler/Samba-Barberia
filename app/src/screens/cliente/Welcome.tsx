@@ -26,7 +26,7 @@ export function Welcome() {
   };
   return (
     <div className="welcome">
-      <PhotoArt hue={24} view="lateral_der" label="Foto demo" />
+      <PhotoArt hue={24} view="lateral_der" img="cut-fade" />
       <div className="brand">
         <Icon name="scissors" size={18} strokeWidth={2.2} /> Samba
       </div>

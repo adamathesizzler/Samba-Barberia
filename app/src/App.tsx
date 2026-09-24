@@ -4,6 +4,7 @@ import { ROLES, useStore, type RoleKey } from "./app/store";
 import { datePart, formatDay, timePart } from "./domain/time";
 import { upcomingAppointments } from "./domain/queries";
 import { Icon, type IconName } from "./ui/Icon";
+import { Sheet } from "./ui/common";
 import { Home } from "./screens/cliente/Home";
 import { Welcome, welcomeSeen } from "./screens/cliente/Welcome";
 import { Explore, ExploreDetail } from "./screens/cliente/Explore";
@@ -77,58 +78,81 @@ function Toast({ msg }: { msg: string | null }) {
   );
 }
 
+/**
+ * Controles de la demo en un botón discreto (arriba, centrado) que abre una hoja.
+ * Así la app se ve como una app y no como una herramienta de desarrollo.
+ */
 function DemoBar() {
   const { role, setRole, now, advance, reset } = useStore();
   const [open, setOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   return (
-    <div className="demo-bar glass" role="region" aria-label="Controles de demostración">
-      <div className="inner">
-        <span className="badge sim">Modo demostración · datos ficticios</span>
-        <select
-          value={role}
-          aria-label="Ver la app como"
-          onChange={(e) => {
-            const r = e.target.value as RoleKey;
-            setRole(r);
-            navigate(ROLES[r].home);
-          }}
-        >
-          {Object.entries(ROLES).map(([k, r]) => (
-            <option key={k} value={k}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-        <button onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-          <span className="code">{timePart(now)}</span> · {formatDay(now).split(" de ")[0]}
-        </button>
-        {open && (
-          <>
-            <button onClick={() => advance(15)}>+15 min</button>
-            <button onClick={() => advance(60)}>+1 h</button>
-            <button onClick={() => advance(60 * 24)}>+1 día</button>
-            {confirmReset ? (
-              <>
-                <span>¿Borrar los cambios de esta demo?</span>
+    <>
+      <button className="demo-pill" onClick={() => setOpen(true)} aria-label="Controles de la demostración">
+        <span className="dot" aria-hidden="true" /> Demo
+      </button>
+      {open && (
+        <Sheet title="Demostración" onClose={() => setOpen(false)}>
+          <p className="small muted">Datos ficticios y fotos de muestra (Unsplash). Los cambios se guardan solo en este navegador.</p>
+          <div className="stack" style={{ gap: 8 }}>
+            <span className="eyebrow">Ver la app como</span>
+            <div className="menu">
+              {(Object.entries(ROLES) as [RoleKey, (typeof ROLES)[RoleKey]][]).map(([k, r]) => (
                 <button
+                  key={k}
                   onClick={() => {
-                    reset();
-                    setConfirmReset(false);
-                    navigate(ROLES[role].home);
+                    setRole(k);
+                    setOpen(false);
+                    navigate(ROLES[k].home);
                   }}
                 >
-                  Sí, reiniciar
+                  <span className="grow">{r.label}</span>
+                  {role === k && <Icon name="check" size={18} />}
                 </button>
-                <button onClick={() => setConfirmReset(false)}>No</button>
-              </>
-            ) : (
-              <button onClick={() => setConfirmReset(true)}>Reiniciar demo</button>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+              ))}
+            </div>
+          </div>
+          <div className="stack" style={{ gap: 8 }}>
+            <span className="eyebrow">
+              Reloj de la demo · {timePart(now)} · {formatDay(now).split(" de ")[0]}
+            </span>
+            <div className="row">
+              <button className="btn outline sm grow" onClick={() => advance(15)}>
+                +15 min
+              </button>
+              <button className="btn outline sm grow" onClick={() => advance(60)}>
+                +1 h
+              </button>
+              <button className="btn outline sm grow" onClick={() => advance(60 * 24)}>
+                +1 día
+              </button>
+            </div>
+          </div>
+          {confirmReset ? (
+            <div className="row">
+              <button
+                className="btn danger grow"
+                onClick={() => {
+                  reset();
+                  setConfirmReset(false);
+                  setOpen(false);
+                  navigate(ROLES[role].home);
+                }}
+              >
+                Sí, borrar cambios
+              </button>
+              <button className="btn outline" onClick={() => setConfirmReset(false)}>
+                No
+              </button>
+            </div>
+          ) : (
+            <button className="btn ghost" onClick={() => setConfirmReset(true)}>
+              Reiniciar demo
+            </button>
+          )}
+        </Sheet>
+      )}
+    </>
   );
 }
 

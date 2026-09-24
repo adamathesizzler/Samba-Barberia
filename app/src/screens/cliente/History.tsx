@@ -53,7 +53,7 @@ export function History({ tab: initialTab }: { tab: string }) {
       {last && heroPhoto ? (
         <header className="fade-hero">
           <div className="parallax" ref={heroRef}>
-            <PhotoArt hue={heroPhoto.hue} view={heroPhoto.view} label={null} />
+            <PhotoArt hue={heroPhoto.hue} view={heroPhoto.view} img={heroPhoto.img} label={null} />
           </div>
           <div className="top-actions">
             <span className="glass-pill">{tab === "estilo" ? "Mis looks" : "Historial"}</span>
@@ -206,7 +206,7 @@ export function VisitDetail({ id }: { id: string }) {
 
       {photos.length ? (
         <div className="stack">
-          <PhotoArt key={current.id} className="swap-in" hue={current.hue} view={current.view} source={current.source} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-xl)", viewTransitionName: photoIdx === 0 ? "foto" : undefined }} />
+          <PhotoArt key={current.id} className="swap-in" hue={current.hue} view={current.view} img={current.img} source={current.source} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-xl)", viewTransitionName: photoIdx === 0 ? "foto" : undefined }} />
           {photos.length > 1 && (
             <div className="chips" role="tablist" aria-label="Fotos de la visita">
               {photos.map((p, i) => (
@@ -334,7 +334,7 @@ export function VisitDetail({ id }: { id: string }) {
 
       {sheet === "compartir" && (
         <Sheet title="Compartir" onClose={() => setSheet(null)}>
-          <PhotoArt hue={current.hue} view={current.view} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-lg)", maxHeight: 300 }} />
+          <PhotoArt hue={current.hue} view={current.view} img={current.img} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-lg)", maxHeight: 300 }} />
           <p className="small">Se comparte solo esta imagen y el nombre del estilo. No se incluyen importes, notas ni el resto de tu historial.</p>
           <p className="xs muted">Compartir no autoriza a la barbería a usar la foto en publicidad. Eso se gestiona en Privacidad.</p>
           <button

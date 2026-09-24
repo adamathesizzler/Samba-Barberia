@@ -11,6 +11,7 @@ import type { PhotoView, Reward, Session } from "../../domain/types";
 import { Icon } from "../../ui/Icon";
 import { Empty, Notice, PageHeader, PhotoArt, Segmented, SimBadge } from "../../ui/common";
 import { haptic } from "../../ui/motion";
+import { DEMO_UPLOAD_POOL } from "../../domain/seed";
 
 const VIEWS: { key: PhotoView; label: string }[] = [
   { key: "frontal", label: "Frontal" },
@@ -217,7 +218,7 @@ export function CloseSession({ id }: { id: string }) {
               key={v.key}
               className="chip"
               onClick={() => {
-                const r = be.uploadPhoto(actor, { appointmentId: appt.id, view: v.key, simulateFailure: failNext });
+                const r = be.uploadPhoto(actor, { appointmentId: appt.id, view: v.key, simulateFailure: failNext, img: DEMO_UPLOAD_POOL[photos.length % DEMO_UPLOAD_POOL.length] });
                 if (!r.ok) toast(r.message);
                 setFailNext(false);
               }}
@@ -233,7 +234,7 @@ export function CloseSession({ id }: { id: string }) {
           <div className="grid-photos">
             {photos.map((p) => (
               <div key={p.id} style={{ position: "relative" }}>
-                <PhotoArt hue={p.hue} view={p.view} label={p.status === "fallida" ? "No subida" : draft.coverPhotoId === p.id || (!draft.coverPhotoId && okPhotos[0]?.id === p.id) ? "Portada" : null} style={{ width: "100%", height: "100%", opacity: p.status === "fallida" ? 0.4 : 1 }} />
+                <PhotoArt hue={p.hue} view={p.view} img={p.img} label={p.status === "fallida" ? "No subida" : draft.coverPhotoId === p.id || (!draft.coverPhotoId && okPhotos[0]?.id === p.id) ? "Portada" : null} style={{ width: "100%", height: "100%", opacity: p.status === "fallida" ? 0.4 : 1 }} />
                 <div style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 4 }}>
                   {p.status === "fallida" ? (
                     <button className="icon-btn on-photo" style={{ width: 34, height: 34 }} aria-label="Reintentar subida" onClick={() => be.retryPhoto(actor, p.id)}>

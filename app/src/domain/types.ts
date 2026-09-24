@@ -34,6 +34,7 @@ export interface Staff {
   bio: string;
   specialties: string[];
   hue: number;
+  photo?: string;
   schedule: WeeklySchedule;
   /** Minutos de preparación entre citas. */
   bufferMin: number;
@@ -76,6 +77,7 @@ export interface Customer {
   name: string;
   phone?: string;
   hue: number;
+  photo?: string;
   /** Cliente registrado en el local sin cuenta verificada. */
   guest: boolean;
   preferredStaffId?: ID;
@@ -206,6 +208,8 @@ export interface Photo {
   at: string;
   /** Solo para dibujar el marcador de demostración. */
   hue: number;
+  /** Imagen de muestra (app/public/photos/<img>.jpg). En producción, la ruta en Storage. */
+  img?: string;
   status: "subida" | "fallida";
 }
 

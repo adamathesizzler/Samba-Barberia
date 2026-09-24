@@ -11,8 +11,9 @@ import { Icon, type IconName } from "./Icon";
 export function PhotoArt({
   hue,
   view = "frontal",
-  label = "Foto demo",
+  label = null,
   source,
+  img,
   className = "",
   style,
 }: {
@@ -20,9 +21,19 @@ export function PhotoArt({
   view?: PhotoView;
   label?: string | null;
   source?: Photo["source"];
+  /** Nombre de una foto de muestra en public/photos. Sin ella se dibuja la silueta. */
+  img?: string;
   className?: string;
   style?: React.CSSProperties;
 }) {
+  const tagText = source === "simulacion_ia" ? "Simulación IA" : source === "referencia_externa" ? "Referencia" : label;
+  if (img)
+    return (
+      <div className={`photo ${className}`} style={style}>
+        <img className="art" src={`photos/${img}.jpg`} alt="" loading="lazy" decoding="async" draggable={false} />
+        {tagText && <span className="demo-tag">{tagText}</span>}
+      </div>
+    );
   const gid = useId().replace(/:/g, "");
   const tag = source === "simulacion_ia" ? "Simulación IA" : source === "referencia_externa" ? "Referencia externa" : label;
   // Variante de corte según el tono: rapado con volumen, texturizado o rizado.
@@ -114,7 +125,13 @@ export function PhotoArt({
   );
 }
 
-export function Avatar({ name, hue, size = "md" }: { name: string; hue: number; size?: "md" | "lg" }) {
+export function Avatar({ name, hue, size = "md", src }: { name: string; hue: number; size?: "md" | "lg"; src?: string }) {
+  if (src)
+    return (
+      <span className={`avatar ${size === "lg" ? "lg" : ""}`} aria-hidden="true">
+        <img src={`photos/${src}.jpg`} alt="" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      </span>
+    );
   return (
     <span className={`avatar ${size === "lg" ? "lg" : ""}`} style={{ background: `linear-gradient(150deg, hsl(${hue} 35% 55%), hsl(${(hue + 40) % 360} 35% 32%))` }} aria-hidden="true">
       {name.trim()[0]?.toUpperCase()}

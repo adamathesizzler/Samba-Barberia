@@ -60,7 +60,7 @@ export function SessionCardScreen({ id }: { id: string }) {
       <PageHeader title="Ficha de sesión" backTo="/pro/hoy" />
 
       <div className="card row">
-        <Avatar name={customer.name} hue={customer.hue} size="lg" />
+        <Avatar name={customer.name} hue={customer.hue} src={customer.photo} size="lg" />
         <div className="grow stack tight">
           <b style={{ fontSize: "var(--fs-lg)" }}>{customer.name}</b>
           <span className="small muted">
@@ -91,7 +91,7 @@ export function SessionCardScreen({ id }: { id: string }) {
           <div className="row" style={{ alignItems: "flex-start" }}>
             {refToShow && (
               <button onClick={() => setZoom(true)} aria-label="Ampliar referencia" style={{ border: 0, padding: 0, background: "none" }}>
-                <PhotoArt hue={refToShow.hue} view={refToShow.view} source={refToShow.source} label={null} style={{ width: 88, height: 110, borderRadius: 14 }} />
+                <PhotoArt hue={refToShow.hue} view={refToShow.view} img={refToShow.img} source={refToShow.source} label={null} style={{ width: 88, height: 110, borderRadius: 14 }} />
               </button>
             )}
             <div className="grow stack">
@@ -185,7 +185,7 @@ export function SessionCardScreen({ id }: { id: string }) {
             return (
               <div key={h.id} className="row">
                 {photos[0] ? (
-                  <PhotoArt hue={photos[0].hue} view={photos[0].view} label={null} style={{ width: 44, height: 56, borderRadius: 10, flexShrink: 0 }} />
+                  <PhotoArt hue={photos[0].hue} view={photos[0].view} img={photos[0].img} style={{ width: 44, height: 56, borderRadius: 10, flexShrink: 0 }} />
                 ) : (
                   <span className="photo" style={{ width: 44, height: 56, borderRadius: 10, flexShrink: 0 }} />
                 )}
@@ -229,7 +229,7 @@ export function SessionCardScreen({ id }: { id: string }) {
 
       {zoom && refToShow && (
         <Sheet title="Referencia" onClose={() => setZoom(false)}>
-          <PhotoArt hue={refToShow.hue} view={refToShow.view} source={refToShow.source} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-lg)" }} />
+          <PhotoArt hue={refToShow.hue} view={refToShow.view} img={refToShow.img} source={refToShow.source} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-lg)" }} />
         </Sheet>
       )}
     </div>

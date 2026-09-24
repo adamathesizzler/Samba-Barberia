@@ -53,7 +53,7 @@ export function Profile() {
         <section className="profile-hero" aria-label="Tu perfil" style={{ minHeight: 440 }}>
           <div className="parallax" ref={heroPhoto}>
             {cover ? (
-              <PhotoArt hue={cover.hue} view={cover.view} label="Foto demo" />
+              <PhotoArt hue={cover.hue} view={cover.view} img={me.photo ?? cover.img} />
             ) : (
               <div className="photo" style={{ background: `linear-gradient(160deg, hsl(${me.hue} 30% 60%), hsl(${me.hue} 25% 20%))` }} />
             )}
@@ -108,7 +108,7 @@ export function Profile() {
                 </span>
                 <div>
                   <div className="xs muted">{available.length ? "Recompensa disponible" : "Próxima recompensa"}</div>
-                  <b className="small">{loyalty.program.rewardName.replace(" (demo)", "")}</b>
+                  <b className="small">{loyalty.program.rewardName}</b>
                 </div>
               </div>
             </div>
@@ -143,9 +143,7 @@ export function Profile() {
             ),
           )}
         </nav>
-        <p className="xs muted">
-          Tu perfil es privado{first ? ` · cliente desde ${formatDay(first.completedAt).split(" de ").slice(1).join(" de ")}` : ""}. La app no cobra: el pago se hace en el local.
-        </p>
+        {first && <p className="xs muted" style={{ textAlign: "center" }}>Cliente desde {formatDay(first.completedAt).split(" de ").slice(1).join(" de ")}</p>}
       </div>
     </div>
   );
@@ -215,7 +213,7 @@ export function Privacy() {
           const on = hasPhotoPermission(state, p.id, "portfolio");
           return (
             <div key={p.id} className="list-item">
-              <PhotoArt hue={p.hue} view={p.view} label={null} style={{ width: 44, height: 56, borderRadius: 10, flexShrink: 0 }} />
+              <PhotoArt hue={p.hue} view={p.view} img={p.img} label={null} style={{ width: 44, height: 56, borderRadius: 10, flexShrink: 0 }} />
               <span className="grow small">
                 {formatDay(session.completedAt)}
                 <div className="xs muted">{state.businesses.find((b) => b.id === p.businessId)?.name}</div>

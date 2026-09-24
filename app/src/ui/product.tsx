@@ -8,7 +8,7 @@ import { totalDuration, totalPrice } from "../domain/availability";
 import { datePart, formatDay, formatMoney, formatRelativeDay, timePart } from "../domain/time";
 import type { Achievement, Appointment, Photo, Preference, Reward, Session, StyleEntry } from "../domain/types";
 import { Icon } from "./Icon";
-import { PhotoArt, ProgressBar, StatusBadge } from "./common";
+import { Avatar, PhotoArt, ProgressBar, StatusBadge } from "./common";
 
 export const priceText = (a: { services: { priceCents: number; priceKind: string }[] }) => {
   const total = totalPrice(a.services as never);
@@ -110,9 +110,7 @@ export function Ticket({ appt, children }: { appt: Appointment; children?: React
       <div className="ticket-cut" />
       <div className="ticket-body">
         <div className="row">
-          <span className="avatar" style={{ background: `hsl(${staff.hue} 35% 45%)` }} aria-hidden>
-            {staff.name[0]}
-          </span>
+          <Avatar name={staff.name} hue={staff.hue} src={staff.photo} />
           <div className="grow">
             <div style={{ fontWeight: 600 }}>{staff.name}</div>
             <div className="small muted">{staff.specialties.join(" · ")}</div>
@@ -149,7 +147,7 @@ export function StyleCard({ entry, onClick }: { entry: StyleEntry; onClick: (pho
   return (
     <button onClick={(e) => onClick(e.currentTarget.querySelector<HTMLElement>(".photo"))} className="card clickable flat" style={{ padding: 0, overflow: "hidden" }} aria-label={entry.title}>
       {photo ? (
-        <PhotoArt hue={photo.hue} view={photo.view} source={photo.source} style={{ aspectRatio: "4 / 5" }} />
+        <PhotoArt hue={photo.hue} view={photo.view} img={photo.img} source={photo.source} style={{ aspectRatio: "4 / 5" }} />
       ) : (
         <div className="photo" style={{ aspectRatio: "4 / 5", display: "grid", placeItems: "center", color: "var(--text-3)" }}>
           <div className="stack tight" style={{ alignItems: "center" }}>
@@ -177,7 +175,7 @@ export function VisitRow({ session, onClick }: { session: Session; onClick: () =
   return (
     <button className="list-item" onClick={onClick}>
       {cover ? (
-        <PhotoArt hue={cover.hue} view={cover.view} label={null} style={{ width: 52, height: 64, borderRadius: 12, flexShrink: 0 }} />
+        <PhotoArt hue={cover.hue} view={cover.view} img={cover.img} label={null} style={{ width: 52, height: 64, borderRadius: 12, flexShrink: 0 }} />
       ) : (
         <span className="photo" style={{ width: 52, height: 64, borderRadius: 12, display: "grid", placeItems: "center", flexShrink: 0, color: "var(--text-3)" }}>
           <Icon name="scissors" size={18} />
@@ -214,9 +212,9 @@ export function BeforeAfterSlider({ before, after, beforeLabel, afterLabel }: { 
         }}
         onPointerMove={(e) => e.buttons && move(e.clientX)}
       >
-        <PhotoArt hue={after.hue} view={after.view} label={null} />
+        <PhotoArt hue={after.hue} view={after.view} img={after.img} label={null} />
         <div style={{ position: "absolute", inset: 0, clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
-          <PhotoArt hue={before.hue} view={before.view} label={null} />
+          <PhotoArt hue={before.hue} view={before.view} img={before.img} label={null} />
         </div>
         <div className="handle" style={{ left: `${pos}%` }} />
         <span className="tag" style={{ left: 10 }}>

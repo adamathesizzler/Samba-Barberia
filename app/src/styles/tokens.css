@@ -2,7 +2,8 @@
    Valores propuestos, no una marca aprobada. El acento es configurable por establecimiento. */
 
 :root {
-  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+  /* SF Pro en dispositivos Apple (como el diseño); Inter en el resto */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
 
   /* escala tipográfica */
   --fs-xs: 0.75rem;

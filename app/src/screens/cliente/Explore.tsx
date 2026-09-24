@@ -43,7 +43,10 @@ export function Explore() {
   const me = state.customers.find((c) => c.id === actor.customerId)!;
   const businessId = me.businessIds[0];
   const f = FILTERS.find((x) => x.key === filter)!;
+  const seen = new Set<string>();
   const photos = portfolioPhotos(state, businessId).filter((p) => {
+    if (seen.has(p.sessionId!)) return false;
+    seen.add(p.sessionId!);
     if (filter === "guardados") return me.savedPhotoIds.includes(p.id);
     if (!f.cats) return true;
     return lookInfo(state, p).cats.some((c) => f.cats!.includes(c));
@@ -77,7 +80,7 @@ export function Explore() {
             const saved = me.savedPhotoIds.includes(p.id);
             return (
               <div key={p.id} className="look-card" role="group" aria-label={info.title}>
-                <PhotoArt hue={p.hue} view={p.view} label={null} />
+                <PhotoArt hue={p.hue} view={p.view} img={p.img} label={null} />
                 <button
                   style={{ position: "absolute", inset: 0, background: "none", border: 0 }}
                   aria-label={`Ver ${info.title}`}
@@ -103,7 +106,6 @@ export function Explore() {
           })}
         </div>
       )}
-      <p className="xs muted">Trabajos reales del local, publicados con permiso de cada cliente. Fotos de demostración.</p>
     </div>
   );
 }
@@ -143,7 +145,7 @@ export function ExploreDetail({ photoId }: { photoId: string }) {
   return (
     <div className="page">
       <section className="look-hero">
-        <PhotoArt key={current.id} className="swap-in" hue={current.hue} view={current.view} label="Foto demo" style={{ viewTransitionName: "foto" }} />
+        <PhotoArt key={current.id} className="swap-in" hue={current.hue} view={current.view} img={current.img} style={{ viewTransitionName: "foto" }} />
         <div className="top">
           <button className="glass-round" aria-label="Volver" onClick={() => back("/cliente/explorar")}>
             <Icon name="chevronLeft" />
@@ -181,7 +183,7 @@ export function ExploreDetail({ photoId }: { photoId: string }) {
         <div className="thumbs" role="group" aria-label="Más trabajos de este barbero">
           {related.slice(0, 4).map((p) => (
             <button key={p.id} aria-pressed={p.id === current.id} aria-label="Ver foto" onClick={() => setShown(p.id)}>
-              <PhotoArt hue={p.hue} view={p.view} label={null} style={{ width: "100%", height: "100%" }} />
+              <PhotoArt hue={p.hue} view={p.view} img={p.img} label={null} style={{ width: "100%", height: "100%" }} />
             </button>
           ))}
         </div>
@@ -220,7 +222,7 @@ export function ExploreDetail({ photoId }: { photoId: string }) {
           ))}
         </ul>
         <p className="xs muted" style={{ marginTop: 8 }}>
-          Precio actual del local. {info.staff.name} confirmará la adaptación: usarlo como referencia no garantiza el mismo resultado.
+          {info.staff.name} adaptará el look a tu pelo.
         </p>
       </section>
 
