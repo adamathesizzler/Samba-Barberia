@@ -16,10 +16,11 @@ Entregables pedidos en el §67 del *Documento maestro v2.0* (24/09/2026). El doc
 | J | Prototipo navegable del recorrido principal | [`../app`](../app) |
 | — | Requisitos con estado y fase (67 apartados + CORE) | [requisitos.md](requisitos.md) |
 | — | Pruebas de aceptación | [pruebas-de-aceptacion.md](pruebas-de-aceptacion.md) |
+| — | Backend Supabase: qué hay, cómo probarlo y cómo ponerlo en marcha | [supabase.md](supabase.md) |
 
 ## Estado a 24/09/2026
 
 - **Hecho:** definición A–I, y un prototipo navegable con datos ficticios que recorre Reserva → Preparación → Check-in → Servicio → Resultado → Historial → Fidelización → Nueva reserva, con reglas de negocio cubiertas por tests.
 - **Simulado y etiquetado:** cámara, Wallet, compartir imágenes, Style AI y música. No existen pagos online ni notificaciones.
-- **No existe:** backend, autenticación real, base de datos, despliegue ni integraciones externas. Tampoco se ha publicado nada ni se han usado datos personales reales.
-- **Bloqueado por decisión del promotor:** plataforma, proveedor, nombre, marca y reglas comerciales (ver I).
+- **Backend (Hito 0):** migraciones de Supabase, permisos (RLS) y funciones escritas y probadas sobre Postgres 16. Todavía **no hay un proyecto de Supabase creado**, la app no está conectada a él y no hay despliegue. No se han usado datos personales reales.
+- **Decidido:** PWA, Supabase, color terracota y fidelización 10 → 1 corte. **Pendiente:** nombre, logo, cancelaciones, lista de espera y exclusiones del premio (ver I).

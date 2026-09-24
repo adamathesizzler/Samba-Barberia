@@ -8,6 +8,7 @@ Este repositorio contiene:
 
 - **`docs/`**: los entregables de definición (arquitectura, pantallas, design system, datos, permisos, tecnología propuesta, plan del MVP, riesgos) y la trazabilidad de los 67 apartados del documento maestro. Empieza por [`docs/README.md`](docs/README.md).
 - **`app/`**: un **prototipo navegable** con datos ficticios. No es una aplicación de producción.
+- **`supabase/`**: el backend del MVP (tablas, permisos por rol, funciones y pruebas). Para ponerlo en marcha, lee [`docs/supabase.md`](docs/supabase.md).
 
 ## Probar el prototipo
 

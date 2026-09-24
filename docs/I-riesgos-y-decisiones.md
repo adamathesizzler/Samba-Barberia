@@ -7,6 +7,7 @@
 | D1 | Plataforma inicial | **Web instalable (PWA)** para cliente, barbero y propietario (opción 1 de F) |
 | D4 | Color de acento | **Terracota** (`--accent` actual), sobre base blanco roto / grafito |
 | D6 | Programa de fidelización inicial | **10 visitas atendidas → 1 corte incluido, válido 90 días** |
+| D2 | Proveedor de backend | **Supabase** (región UE recomendada; la crea el promotor) |
 | D3 | Nombre comercial | **Aún sin decidir**: se mantiene «Samba» como provisional |
 
 ## Decisiones pendientes del promotor
@@ -14,7 +15,7 @@
 | # | Decisión | Por qué bloquea | Propuesta provisional |
 |---|---|---|---|
 | D1 | ~~Plataforma inicial~~ | — | **Decidido: PWA** |
-| D2 | **Proveedor de backend** y región de datos | Coste y tratamiento de datos | Supabase en la UE, a validar |
+| D2 | ~~Proveedor de backend~~ | — | **Decidido: Supabase**; falta elegir región al crear el proyecto |
 | D3 | **Nombre comercial** | Dominio, pases Wallet, textos | Se usa «Samba» como **nombre de trabajo** porque es el nombre del repositorio. No está aprobado. |
 | D4 | Logo (color **decidido: terracota**) | Identidad | Pendiente de nombre |
 | D5 | Reglas de **cancelación, cambios, señales y ausencias** | Ticket, gestión de cita | Sin reglas; el prototipo lo indica |

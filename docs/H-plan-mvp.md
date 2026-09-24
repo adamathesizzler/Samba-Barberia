@@ -4,6 +4,18 @@ Se parte del prototipo: el dominio y las pantallas ya existen, y el MVP las cone
 
 **Prerrequisito:** plataforma ya decidida (PWA, I-D1); falta aprobar el proveedor de backend (I-D2). Sin esa aprobación no se crea infraestructura.
 
+## Estado (24/09/2026)
+
+| Tarea | Estado |
+|---|---|
+| 0.1 Migraciones | ✅ `supabase/migrations/` (esquema completo del modelo D) |
+| 0.2 RLS + pruebas por rol | ✅ probado en Postgres 16; pendiente de verificar en el proyecto real (docs/supabase.md, paso 4) |
+| 0.3 Autenticación | 🟡 lado servidor hecho (`ensure_customer_profile`, invitado anónimo que conserva su id al verificarse); faltan las pantallas de acceso |
+| 0.4 App contra la API | ⏳ bloqueada hasta tener el proyecto creado (URL y clave pública) |
+| 0.5 CI | ✅ `.github/workflows/ci.yml`: tipos, pruebas y build de la app + migraciones y pruebas SQL |
+
+Además, la lógica de servidor de casi todo el Hito 1 y parte del 2 ya está implementada y probada: 1.1, 1.2, 1.4, 1.7, 1.9, 1.10 y 2.8/2.9 completas; 1.3, 1.5 y 1.6 en su lado de servidor. Falta conectarlas a las pantallas (0.4).
+
 ## Hito 0 · Cimientos
 
 | # | Tarea | CORE | Verificación |
