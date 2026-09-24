@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { DemoBackend } from "../domain/backend";
-import { createSeed, demoToday, DEMO } from "../domain/seed";
+import { createSeed, demoToday, DEMO, SEED_VERSION } from "../domain/seed";
 import { addMinutes } from "../domain/time";
 import type { Actor, DemoState } from "../domain/types";
 
@@ -45,7 +45,7 @@ function boot() {
     state = null;
   }
   // Una demo guardada de otro día se regenera para que la agenda de «hoy» tenga sentido.
-  if (!state || now.slice(0, 10) < today.slice(0, 10)) {
+  if (!state || state.version !== SEED_VERSION || now.slice(0, 10) < today.slice(0, 10)) {
     now = today;
     state = createSeed(now);
   }

@@ -30,9 +30,11 @@ export function Welcome() {
       <div className="brand">
         <Icon name="scissors" size={18} strokeWidth={2.2} /> Samba
       </div>
-      <p className="headline">Tu estilo, recordado.</p>
+      <p className="headline" style={{ fontWeight: 300, textTransform: "uppercase", letterSpacing: "0.01em" }}>
+        Tu estilo. Siempre contigo.
+      </p>
       <div className="panel glass">
-        <h2>Tu barbero sabe cómo te gusta</h2>
+        <h2>Tu barbero recuerda cómo te gusta</h2>
         <p className="small muted" style={{ maxWidth: 300 }}>
           Reserva, prepara tu visita y guarda cada resultado para repetirlo o cambiarlo la próxima vez.
         </p>

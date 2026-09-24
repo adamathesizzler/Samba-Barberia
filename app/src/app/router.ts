@@ -22,11 +22,12 @@ export function useRoute() {
 }
 
 // Pestañas principales: moverse entre ellas es lateral (fundido), no «entrar» ni «salir».
-const TABS = new Set(["inicio", "explorar", "historial", "perfil", "hoy", "escanear", "canjear", "gestion"]);
+const TABS = new Set(["inicio", "explorar", "citas", "historial", "perfil", "hoy", "escanear", "canjear", "gestion"]);
 const depth = (path: string) => {
   const parts = path.replace(/^#?\/?/, "").split("?")[0].split("/").filter(Boolean);
   const screen = parts[0] === "gestion" ? "gestion" : parts[1];
-  return !screen || TABS.has(screen) ? 0 : parts.length;
+  // Una pestaña es nivel 0; su detalle (p. ej. /cliente/explorar/:id) ya es un nivel más.
+  return !screen || (TABS.has(screen) && parts.length <= 2) ? 0 : parts.length;
 };
 
 type VT = { finished: Promise<void> };

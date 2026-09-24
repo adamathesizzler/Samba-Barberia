@@ -5,7 +5,11 @@
 | # | Decisión | Elegido |
 |---|---|---|
 | D1 | Plataforma inicial | **Web instalable (PWA)** para cliente, barbero y propietario (opción 1 de F) |
-| D4 | Color de acento | **Terracota** (`--accent` actual), sobre base blanco roto / grafito |
+| D4 | Color de acento | ~~Terracota~~ → **azul #3B82F6 / violeta #7C3AED** con glow #EDEBFF, sobre blanco/negro, según el diseño v1.0 del promotor (24/09/2026). Aplicado por defecto al no recibir respuesta; reversible |
+| D14 | «Métodos de pago» en Perfil | **«Próximamente»**, sin función: el MVP no cobra online (§10). Aplicado por defecto; reversible |
+| D15 | Style AI en Inicio | Se mantiene la tarjeta con etiqueta **«Próximamente»** (Fase 3). Aplicado por defecto; reversible |
+| D16 | Fotos | Se siguen usando siluetas de demostración: las fotos del diseño no tienen derechos de uso acreditados. Hacen falta fotos propias o con licencia |
+| D17 | Navegación | Pestaña **Citas** (Próximas / Pasadas) en lugar de Historial, como en el diseño v1.0 |
 | D6 | Programa de fidelización inicial | **10 visitas atendidas → 1 corte incluido, válido 90 días** |
 | D2 | Proveedor de backend | **Supabase** (región UE recomendada; la crea el promotor) |
 | D3 | Nombre comercial | **Aún sin decidir**: se mantiene «Samba» como provisional |

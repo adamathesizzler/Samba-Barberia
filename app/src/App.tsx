@@ -11,6 +11,7 @@ import { Booking } from "./screens/cliente/Booking";
 import { AppointmentDetail, Pass } from "./screens/cliente/Appointment";
 import { Prepare } from "./screens/cliente/Prepare";
 import { History, VisitDetail } from "./screens/cliente/History";
+import { Citas } from "./screens/cliente/Citas";
 import { Profile, Settings, Privacy, Preferences } from "./screens/cliente/Profile";
 import { Rewards, Activity, Waitlist, StyleAI } from "./screens/cliente/Rewards";
 import { Today, Scan, Redeem, WalkIn } from "./screens/barbero/Today";
@@ -137,7 +138,7 @@ function ClientNav({ current }: { current: string }) {
   const items: { key: string; label: string; icon: IconName }[] = [
     { key: "inicio", label: "Inicio", icon: "home" },
     { key: "explorar", label: "Explorar", icon: "compass" },
-    { key: "historial", label: "Historial", icon: "history" },
+    { key: "citas", label: "Citas", icon: "calendar" },
     { key: "perfil", label: "Perfil", icon: "user" },
   ];
   const next = actor.kind === "cliente" ? upcomingAppointments(state, actor.customerId, now)[0] : undefined;
@@ -253,7 +254,9 @@ export default function App() {
         cita: <AppointmentDetail id={id} />,
         pase: <Pass id={id} />,
         preparar: <Prepare id={id} />,
-        historial: <History tab={query.get("tab") ?? "visitas"} />,
+        citas: <Citas tab={query.get("tab")} />,
+        historial: <Citas tab="pasadas" />,
+        looks: <History tab="estilo" />,
         visita: <VisitDetail id={id} />,
         perfil: <Profile />,
         recompensas: <Rewards />,

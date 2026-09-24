@@ -133,3 +133,11 @@ Criterios de Emil Kowalski (design engineering) y de *Designing Fluid Interfaces
 | Aviso (toast) | Entra con desenfoque y escala; sale más rápido de lo que entró |
 | Háptica con significado | Vibración breve en reserva confirmada, llegada registrada, sesión cerrada y errores. Nunca en navegación normal |
 | Accesibilidad | Con «reducir movimiento»: sin transiciones de pantalla, parallax ni inclinación; las entradas pasan a fundidos de 200 ms. Con «reducir transparencia», el cristal es opaco |
+
+## Diseño v1.0 del promotor (R14, 24/09/2026)
+
+Hoja de diseño «Barbería · Tu estilo, siempre contigo» con cinco pantallas (Inicio, Explorar, Detalle de look, Reserva, Perfil), componentes, colores (Negro #0B0B0C, Gris oscuro #1C1C1E, Gris #8E8E93, Gris claro #D1D1D6, Blanco, Azul #3B82F6, Violeta #7C3AED, Glow #EDEBFF), tipografía SF Pro Display y barra inferior Inicio · Explorar · (+) · Citas · Perfil. **Sustituye a R11–R13 como dirección visual principal**; los tokens se han reescrito con esta paleta.
+
+Lo que se añadió dentro de esa estética (lo que el diseño no cubría) está en [`prompt-diseno-faltante.md`](prompt-diseno-faltante.md): tarjeta de cita que cambia con el momento, ticket y pase QR, reserva completa (servicios, barbero, lista de espera, preparar mi visita, total), pestaña Citas con pasadas y detalle de visita, recompensas completas, preferencias, privacidad de fotos, actividad, app del barbero y gestión.
+
+Componentes nuevos: `.home-hero`, `.dark-glass`, `.next-card`, `.quick`, `.looks-row`/`.look-mini`, `.ai-card`/`.ai-orb`, `.explore-grid`/`.look-card`, `.look-hero`, `.thumbs`, `.pill-cta` (+ `.dark`), `.date-chip`, `.time-grid`/`.time-chip`, `.svc-card`, `.barber-card`, `.action-bar`, `.stat-tiles`, `.progress-card`/`.bar`, `.menu`, `.appt-mini`, `.soon`. El Perfil se pinta siempre en oscuro con la clase `.theme-dark`, que redefine los tokens solo en esa pantalla.

@@ -21,6 +21,9 @@ export function demoToday(real = new Date()): string {
   return toLocal(d);
 }
 
+/** Sube cuando cambia la forma de los datos: la demo guardada en el navegador se regenera. */
+export const SEED_VERSION = 2;
+
 export const DEMO = {
   business: "biz_norte",
   otherBusiness: "biz_sur",
@@ -41,7 +44,7 @@ export function createSeed(now: string): DemoState {
   const code = () => `B${codeN++}`;
 
   const s: DemoState = {
-    version: 1,
+    version: SEED_VERSION,
     businesses: [
       { id: DEMO.business, name: "Barbería Norte (demo)", isDemo: true },
       { id: DEMO.otherBusiness, name: "Estudio Sur (demo)", isDemo: true },
@@ -92,11 +95,12 @@ export function createSeed(now: string): DemoState {
     customers: [
       {
         id: DEMO.customer, businessIds: [DEMO.business, DEMO.otherBusiness], name: "Nico Ferrer", phone: "600 000 000", hue: 28, guest: false,
-        preferredStaffId: DEMO.david, sessionStyle: { tranquila: true, explicarCambios: false, consultarAntes: true },
+        preferredStaffId: DEMO.david, sessionStyle: { tranquila: true, explicarCambios: false, consultarAntes: true }, savedPhotoIds: [],
       },
       ...["Alex", "Marco", "Samuel", "Iker", "Joel"].map((name, i) => ({
         id: `cli_${name.toLowerCase()}`, businessIds: [DEMO.business], name: `${name} (demo)`, hue: 60 * i + 10, guest: false,
         sessionStyle: { tranquila: false, explicarCambios: false, consultarAntes: false },
+        savedPhotoIds: [],
       })),
     ],
     appointments: [],
@@ -194,7 +198,7 @@ export function createSeed(now: string): DemoState {
   };
 
   // --- Historial de Nico: 19 visitas en Norte, aproximadamente cada 24 días ---
-  const titles = ["Degradado bajo + barba", "Degradado bajo + barba", "Corte clásico + barba", "Degradado medio", "Degradado bajo + barba"];
+  const titles = ["Low taper + barba", "Textured crop", "Corte clásico + barba", "Mid fade", "Fade + barba", "Crop texturizado", "Degradado bajo + barba"];
   let lastNicoSession = "";
   for (let i = 19; i >= 1; i--) {
     const day = workday(addDays(`${today}T18:30`, -i * 24 + (i % 3) - 1));
@@ -242,7 +246,7 @@ export function createSeed(now: string): DemoState {
     const ids = staffId === DEMO.sara ? [["srv_color"], ["srv_trenzas"], ["srv_corte", "srv_trat"]][i % 3] : [["srv_degradado", "srv_barba"], ["srv_degradado"], ["srv_corte", "srv_barba"]][i % 3];
     const day = workday(addDays(now, -(8 + i * 5)));
     const appt = addAppt({ customerId: cid, staffId, start: `${datePart(day)}T${10 + i}:00`, services: svc(ids, staffId), status: "confirmada" });
-    completed(appt, { title: ids.map((x) => s.services.find((v) => v.id === x)!.name).join(" + "), photos: 2, portfolio: true });
+    completed(appt, { title: ["Burst fade + barba", "Platino", "Box braids", "Buzz cut", "Corte clásico + tratamiento"][i], photos: 2, portfolio: true });
   });
 
   // --- Agenda de hoy (hora de demostración 10:00) ---

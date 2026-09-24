@@ -56,7 +56,7 @@ export function History({ tab: initialTab }: { tab: string }) {
             <PhotoArt hue={heroPhoto.hue} view={heroPhoto.view} label={null} />
           </div>
           <div className="top-actions">
-            <span className="glass-pill">Historial</span>
+            <span className="glass-pill">{tab === "estilo" ? "Mis looks" : "Historial"}</span>
             <span className="glass-pill">{sessions.length} visitas</span>
           </div>
           <div className="big-date">

@@ -80,6 +80,8 @@ export interface Customer {
   guest: boolean;
   preferredStaffId?: ID;
   sessionStyle: SessionStylePrefs;
+  /** Trabajos del portfolio guardados desde Explorar («Quiero probar»). */
+  savedPhotoIds: ID[];
 }
 
 export interface SessionStylePrefs {

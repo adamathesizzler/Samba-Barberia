@@ -4,10 +4,10 @@ import { navigate } from "../../app/router";
 import { useStore } from "../../app/store";
 import { useTheme } from "../../App";
 import { hasPhotoPermission } from "../../domain/permissions";
-import { customerSessions, upcomingAppointments } from "../../domain/queries";
-import { formatDay } from "../../domain/time";
+import { customerSessions, loyaltyProgress } from "../../domain/queries";
+import { daysBetween, formatDay } from "../../domain/time";
 import { Icon, type IconName } from "../../ui/Icon";
-import { Empty, Notice, PageHeader, PhotoArt, Segmented, Switch } from "../../ui/common";
+import { Notice, PageHeader, PhotoArt, Segmented, Switch } from "../../ui/common";
 import { PreferenceChip } from "../../ui/product";
 import { useCountUp, useParallax } from "../../ui/motion";
 
@@ -15,6 +15,7 @@ function Count({ to }: { to: number }) {
   return <>{useCountUp(to)}</>;
 }
 
+/** 05 · Perfil (diseño v1.0): pantalla oscura con foto, cifras, progreso y menú. */
 export function Profile() {
   const { state, actor, now } = useStore();
   const heroPhoto = useParallax<HTMLDivElement>(0.4);
@@ -22,129 +23,129 @@ export function Profile() {
   const me = state.customers.find((c) => c.id === actor.customerId)!;
   const sessions = customerSessions(state, me.id);
   const entries = state.styleEntries.filter((e) => e.customerId === me.id);
-  const rewards = state.rewards.filter((r) => r.customerId === me.id);
   const photos = state.photos.filter((p) => p.customerId === me.id && p.status === "subida" && p.sessionId);
   const coverId = entries.find((e) => e.favorite && e.coverPhotoId)?.coverPhotoId ?? photos[photos.length - 1]?.id;
   const cover = state.photos.find((p) => p.id === coverId);
   const preferred = state.staff.find((s) => s.id === me.preferredStaffId);
   const biz = state.businesses.find((b) => b.id === me.businessIds[0]);
-  const prefs = state.preferences.filter((p) => p.customerId === me.id && p.confirmed);
   const first = sessions.at(-1);
-  const next = upcomingAppointments(state, me.id, now)[0];
+  const loyalty = biz ? loyaltyProgress(state, me.id, biz.id) : null;
+  const available = state.rewards.filter((r) => r.customerId === me.id && r.status === "disponible");
+  const savedLooks = entries.filter((e) => e.favorite).length + me.savedPhotoIds.length;
+  const months = first ? Math.max(0, Math.floor(daysBetween(first.completedAt, now) / 30.4)) : 0;
+  const together = months >= 12 ? { n: Math.floor(months / 12), label: Math.floor(months / 12) === 1 ? "Año contigo" : "Años contigo" } : { n: months, label: months === 1 ? "Mes contigo" : "Meses contigo" };
+  const pendingPrefs = state.preferences.filter((p) => p.customerId === me.id && !p.confirmed).length;
 
-  const links: { to: string; icon: IconName; label: string; hint?: string }[] = [
-    { to: "/cliente/recompensas", icon: "gift", label: "Recompensas y logros" },
-    { to: "/cliente/actividad", icon: "euro", label: "Mi actividad", hint: "Gasto y visitas, solo para ti" },
-    { to: "/cliente/preferencias", icon: "scissors", label: "Preferencias y cómo quiero mi sesión" },
+  const menu: { to?: string; icon: IconName; label: string; hint?: string; soon?: boolean; badge?: number }[] = [
+    { to: "/cliente/looks", icon: "heart", label: "Mis looks", hint: "Favoritos, mis cortes, quiero probar" },
+    { to: "/cliente/recompensas", icon: "gift", label: "Recompensas y logros", badge: available.length },
+    { to: "/cliente/actividad", icon: "clock", label: "Mi actividad" },
+    { to: "/cliente/preferencias", icon: "scissors", label: "Preferencias", badge: pendingPrefs },
     { to: "/cliente/privacidad", icon: "lock", label: "Privacidad y fotos" },
-    { to: "/cliente/espera", icon: "bell", label: "Lista de espera" },
+    { icon: "card", label: "Métodos de pago", soon: true },
+    { to: "/cliente/espera", icon: "bell", label: "Notificaciones y lista de espera" },
     { to: "/cliente/ajustes", icon: "settings", label: "Ajustes" },
   ];
 
   return (
-    <div className="page">
-      <section className="profile-hero" aria-label="Tu perfil">
-        <div className="parallax" ref={heroPhoto}>
-          {cover ? (
-            <PhotoArt hue={cover.hue} view={cover.view} label="Foto demo" />
-          ) : (
-            <div className="photo" style={{ background: `linear-gradient(160deg, hsl(${me.hue} 30% 80%), hsl(${me.hue} 25% 45%))` }} />
-          )}
-        </div>
-        <div className="hero-actions">
-          <a className="glass-round" href="#/cliente/ajustes" aria-label="Ajustes">
-            <Icon name="settings" />
-          </a>
-          <a className="glass-round" href="#/cliente/privacidad" aria-label="Privacidad y fotos">
-            <Icon name="lock" />
-          </a>
-        </div>
-        <div className="content">
-          <div className="stack tight" style={{ alignItems: "center" }}>
+    <div className="theme-dark dark-screen">
+      <div className="page">
+        <section className="profile-hero" aria-label="Tu perfil" style={{ minHeight: 440 }}>
+          <div className="parallax" ref={heroPhoto}>
+            {cover ? (
+              <PhotoArt hue={cover.hue} view={cover.view} label="Foto demo" />
+            ) : (
+              <div className="photo" style={{ background: `linear-gradient(160deg, hsl(${me.hue} 30% 60%), hsl(${me.hue} 25% 20%))` }} />
+            )}
+          </div>
+          <div className="hero-actions" style={{ justifyContent: "flex-end" }}>
+            <a className="glass-round" href="#/cliente/ajustes" aria-label="Ajustes">
+              <Icon name="settings" />
+            </a>
+          </div>
+          <div className="content" style={{ alignItems: "flex-start", textAlign: "left" }}>
             <h1>{me.name}</h1>
             <span className="muted">
               {biz?.name}
               {preferred ? ` · con ${preferred.name}` : ""}
             </span>
           </div>
-          <div className="row" style={{ width: "100%" }}>
-            <button className="btn primary grow" style={{ minHeight: 52 }} onClick={() => navigate("/cliente/reservar")}>
-              Reservar
-            </button>
-            <button
-              className="icon-btn"
-              style={{ width: 52, height: 52, border: "1px solid var(--border)", background: "var(--glass)" }}
-              aria-label={next ? "Mostrar QR de tu próxima cita" : "Lista de espera"}
-              onClick={() => navigate(next ? `/cliente/pase/${next.id}` : "/cliente/espera")}
-            >
-              <Icon name={next ? "qr" : "bell"} />
-            </button>
-          </div>
-          <div className="profile-stats">
-            <div className="stat">
-              <b>
-                <Count to={sessions.length} />
-              </b>
-              <span>visitas</span>
-            </div>
-            <div className="stat">
-              <b>
-                <Count to={entries.filter((e) => e.coverPhotoId).length} />
-              </b>
-              <span>estilos</span>
-            </div>
-            <div className="stat">
-              <b>
-                <Count to={rewards.length} />
-              </b>
-              <span>recompensas</span>
-            </div>
-          </div>
-          <div className="bio glass">
-            {prefs.length ? prefs.map((p) => `${p.label}: ${p.value.toLowerCase()}`).join(" · ") : "Aún no has guardado preferencias de estilo."}
-            {first && <div className="xs muted" style={{ marginTop: 4 }}>Cliente desde {formatDay(first.completedAt).split(" de ").slice(1).join(" de ")}</div>}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="section">
-        <div className="section-title">
-          Mi colección
-          <a href="#/cliente/historial?tab=estilo" className="section-count" style={{ textDecoration: "none" }}>
-            {photos.length} fotos
-          </a>
-        </div>
-        {photos.length === 0 ? (
-          <Empty icon="camera" title="Tu colección empieza en tu primera visita">
-            Tu barbero podrá añadir fotos del resultado. Son privadas salvo que autorices otra cosa.
-          </Empty>
-        ) : (
-          <div className="grid-photos">
-            {photos
-              .slice()
-              .reverse()
-              .slice(0, 9)
-              .map((p) => (
-                <button key={p.id} aria-label="Abrir visita" onClick={(e) => navigate(`/cliente/visita/${p.sessionId}`, e.currentTarget.querySelector<HTMLElement>(".photo"))}>
-                  <PhotoArt hue={p.hue} view={p.view} label={null} style={{ width: "100%", height: "100%" }} />
-                </button>
-              ))}
+        <div className="stat-tiles">
+          <div className="stat-tile">
+            <b>
+              <Count to={savedLooks} />
+            </b>
+            <span>Looks guardados</span>
           </div>
+          <div className="stat-tile">
+            <b>
+              <Count to={sessions.length} />
+            </b>
+            <span>Citas realizadas</span>
+          </div>
+          <div className="stat-tile">
+            <b>
+              <Count to={together.n} />
+            </b>
+            <span>{together.label}</span>
+          </div>
+        </div>
+
+        {loyalty && (
+          <button className="progress-card" onClick={() => navigate("/cliente/recompensas")} aria-label="Tu progreso de recompensas">
+            <div className="row between">
+              <div>
+                <div className="xs muted">Tu progreso</div>
+                <div className="big">
+                  {loyalty.inCycle}/{loyalty.program.goal}
+                </div>
+              </div>
+              <div className="row" style={{ gap: 8 }}>
+                <span style={{ color: "var(--loyalty)" }}>
+                  <Icon name="crown" size={22} />
+                </span>
+                <div>
+                  <div className="xs muted">{available.length ? "Recompensa disponible" : "Próxima recompensa"}</div>
+                  <b className="small">{loyalty.program.rewardName.replace(" (demo)", "")}</b>
+                </div>
+              </div>
+            </div>
+            <div className="bar" aria-hidden="true">
+              <span style={{ width: `${(loyalty.inCycle / loyalty.program.goal) * 100}%` }} />
+            </div>
+          </button>
         )}
-        <p className="xs muted">Tu perfil es privado: aunque se parezca a una red social, ningún otro cliente puede verlo.</p>
-      </section>
 
-      <div className="list">
-        {links.map((l) => (
-          <a key={l.to} className="list-item" href={`#${l.to}`}>
-            <Icon name={l.icon} />
-            <span className="grow">
-              {l.label}
-              {l.hint && <div className="xs muted">{l.hint}</div>}
-            </span>
-            <Icon name="chevronRight" />
-          </a>
-        ))}
+        <nav className="menu" aria-label="Tu cuenta">
+          {menu.map((m) =>
+            m.soon ? (
+              <button key={m.label} disabled style={{ opacity: 0.6, cursor: "default" }}>
+                <span className="ico">
+                  <Icon name={m.icon} size={17} />
+                </span>
+                <span className="grow">{m.label}</span>
+                <span className="soon">Próximamente</span>
+              </button>
+            ) : (
+              <a key={m.label} href={`#${m.to}`}>
+                <span className="ico">
+                  <Icon name={m.icon} size={17} />
+                </span>
+                <span className="grow">
+                  {m.label}
+                  {m.hint && <div className="xs muted">{m.hint}</div>}
+                </span>
+                {!!m.badge && <span className="badge" style={{ background: "var(--accent)", color: "var(--on-accent)" }}>{m.badge}</span>}
+                <Icon name="chevronRight" />
+              </a>
+            ),
+          )}
+        </nav>
+        <p className="xs muted">
+          Tu perfil es privado{first ? ` · cliente desde ${formatDay(first.completedAt).split(" de ").slice(1).join(" de ")}` : ""}. La app no cobra: el pago se hace en el local.
+        </p>
       </div>
     </div>
   );

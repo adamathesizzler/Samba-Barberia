@@ -4,7 +4,7 @@
 // pasan a la base de datos y a funciones de servidor (docs/F-arquitectura-tecnica.md).
 
 import { BLOCKING_STATUSES, freeSlots, isSlotFree, priceServicesFor, staffForServices, totalDuration, totalPrice } from "./availability";
-import { PermissionError, actorLabel, canAccessAppointment, canCheckIn, canManageBusiness, isStaff } from "./permissions";
+import { PermissionError, actorLabel, canAccessAppointment, canCheckIn, canManageBusiness, hasPhotoPermission, isStaff } from "./permissions";
 import { addDays, addMinutes, datePart } from "./time";
 import type {
   Actor,
@@ -271,6 +271,7 @@ export class DemoBackend {
       hue: Math.floor(Math.random() * 360),
       guest: true,
       sessionStyle: { tranquila: false, explicarCambios: false, consultarAntes: false },
+      savedPhotoIds: [],
     };
     this.state.customers.push(customer);
     const appointment: Appointment = {
@@ -573,6 +574,18 @@ export class DemoBackend {
     const e = this.state.styleEntries.find((x) => x.id === styleEntryId);
     if (!e || actor.kind !== "cliente" || e.customerId !== actor.customerId) throw new PermissionError();
     e.favorite = !e.favorite;
+    this.commit();
+  }
+
+  /** Guardar un trabajo del portfolio. Solo si sigue autorizado para publicarse. */
+  toggleSavedLook(actor: Actor, photoId: ID) {
+    if (actor.kind !== "cliente") throw new PermissionError();
+    const c = this.state.customers.find((x) => x.id === actor.customerId)!;
+    if (c.savedPhotoIds.includes(photoId)) c.savedPhotoIds = c.savedPhotoIds.filter((x) => x !== photoId);
+    else {
+      if (!hasPhotoPermission(this.state, photoId, "portfolio")) throw new PermissionError("Este trabajo ya no está publicado.");
+      c.savedPhotoIds = [...c.savedPhotoIds, photoId];
+    }
     this.commit();
   }
 
