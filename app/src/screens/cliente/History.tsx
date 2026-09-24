@@ -7,8 +7,9 @@ import { customerSessions, sessionPhotos } from "../../domain/queries";
 import { formatDate, formatDay, formatMoney } from "../../domain/time";
 import type { ServiceCategory } from "../../domain/types";
 import { Icon } from "../../ui/Icon";
-import { Empty, Notice, PageHeader, PhotoArt, Sheet, SimBadge } from "../../ui/common";
+import { Empty, Notice, PageHeader, PhotoArt, Segmented, Sheet, SimBadge } from "../../ui/common";
 import { BeforeAfterSlider, StyleCard, VisitRow } from "../../ui/product";
+import { haptic, useParallax } from "../../ui/motion";
 
 const STYLE_TABS: { key: string; label: string; cats?: ServiceCategory[] }[] = [
   { key: "favoritos", label: "Favoritos" },
@@ -19,11 +20,13 @@ const STYLE_TABS: { key: string; label: string; cats?: ServiceCategory[] }[] = [
   { key: "probar", label: "Quiero probar" },
 ];
 
-export function History({ tab }: { tab: string }) {
+export function History({ tab: initialTab }: { tab: string }) {
   const { state, actor } = useStore();
+  const [tab, setTab] = useState<"visitas" | "estilo">(initialTab === "estilo" ? "estilo" : "visitas");
   const [styleTab, setStyleTab] = useState("favoritos");
   const [cat, setCat] = useState<string>("todo");
   const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const heroRef = useParallax<HTMLDivElement>(0.45);
   if (actor.kind !== "cliente") return null;
   const sessions = customerSessions(state, actor.customerId);
   const entries = state.styleEntries.filter((e) => e.customerId === actor.customerId);
@@ -49,7 +52,9 @@ export function History({ tab }: { tab: string }) {
     <div className="page">
       {last && heroPhoto ? (
         <header className="fade-hero">
-          <PhotoArt hue={heroPhoto.hue} view={heroPhoto.view} label={null} />
+          <div className="parallax" ref={heroRef}>
+            <PhotoArt hue={heroPhoto.hue} view={heroPhoto.view} label={null} />
+          </div>
           <div className="top-actions">
             <span className="glass-pill">Historial</span>
             <span className="glass-pill">{sessions.length} visitas</span>
@@ -69,14 +74,18 @@ export function History({ tab }: { tab: string }) {
       ) : (
         <PageHeader title="Historial" />
       )}
-      <div className="segmented" role="tablist">
-        <button role="tab" aria-selected={tab === "visitas"} onClick={() => navigate("/cliente/historial?tab=visitas")}>
-          Visitas
-        </button>
-        <button role="tab" aria-selected={tab === "estilo"} onClick={() => navigate("/cliente/historial?tab=estilo")}>
-          Mi estilo
-        </button>
-      </div>
+      <Segmented
+        label="Historial"
+        value={tab}
+        onChange={(t) => {
+          setTab(t);
+          history.replaceState(null, "", `#/cliente/historial?tab=${t}`);
+        }}
+        options={[
+          { key: "visitas", label: "Visitas" },
+          { key: "estilo", label: "Mi estilo" },
+        ]}
+      />
 
       {tab === "visitas" ? (
         <>
@@ -118,13 +127,16 @@ export function History({ tab }: { tab: string }) {
           </div>
           <div className="row between">
             <span className="small muted">{styleEntries.length} estilos</span>
-            <div className="segmented" style={{ width: 120 }} role="tablist" aria-label="Vista">
-              <button role="tab" aria-selected={layout === "grid"} aria-label="Cuadrícula" onClick={() => setLayout("grid")}>
-                <Icon name="grid" size={16} />
-              </button>
-              <button role="tab" aria-selected={layout === "list"} aria-label="Lista" onClick={() => setLayout("list")}>
-                <Icon name="list" size={16} />
-              </button>
+            <div style={{ width: 120 }}>
+              <Segmented
+                label="Vista"
+                value={layout}
+                onChange={setLayout}
+                options={[
+                  { key: "grid", label: <Icon name="grid" size={16} />, aria: "Cuadrícula" },
+                  { key: "list", label: <Icon name="list" size={16} />, aria: "Lista" },
+                ]}
+              />
             </div>
           </div>
           {styleEntries.length === 0 ? (
@@ -134,7 +146,7 @@ export function History({ tab }: { tab: string }) {
           ) : layout === "grid" ? (
             <div className="grid-2">
               {styleEntries.map((e) => (
-                <StyleCard key={e.id} entry={e} onClick={() => navigate(`/cliente/visita/${e.sessionId}`)} />
+                <StyleCard key={e.id} entry={e} onClick={(el) => navigate(`/cliente/visita/${e.sessionId}`, el)} />
               ))}
             </div>
           ) : (
@@ -182,7 +194,10 @@ export function VisitDetail({ id }: { id: string }) {
         backTo="/cliente/historial"
         action={
           entry && (
-            <button className="icon-btn" aria-pressed={entry.favorite} aria-label={entry.favorite ? "Quitar de favoritos" : "Guardar como favorito"} onClick={() => be.toggleFavorite(actor, entry.id)} style={entry.favorite ? { background: "var(--selected)", color: "var(--on-selected)" } : undefined}>
+            <button className="icon-btn" aria-pressed={entry.favorite} aria-label={entry.favorite ? "Quitar de favoritos" : "Guardar como favorito"} onClick={() => {
+                be.toggleFavorite(actor, entry.id);
+                if (!entry.favorite) haptic();
+              }} style={entry.favorite ? { background: "var(--selected)", color: "var(--on-selected)" } : undefined}>
               <Icon name="heart" />
             </button>
           )
@@ -191,7 +206,7 @@ export function VisitDetail({ id }: { id: string }) {
 
       {photos.length ? (
         <div className="stack">
-          <PhotoArt key={current.id} hue={current.hue} view={current.view} source={current.source} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-xl)" }} />
+          <PhotoArt key={current.id} className="swap-in" hue={current.hue} view={current.view} source={current.source} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-xl)", viewTransitionName: photoIdx === 0 ? "foto" : undefined }} />
           {photos.length > 1 && (
             <div className="chips" role="tablist" aria-label="Fotos de la visita">
               {photos.map((p, i) => (

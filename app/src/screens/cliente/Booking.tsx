@@ -8,6 +8,7 @@ import { addDays, datePart, formatDay, formatMoney, parseLocal, timePart, weekda
 import { Icon } from "../../ui/Icon";
 import { Avatar, Notice, PhotoArt } from "../../ui/common";
 import { capitalize } from "../../ui/product";
+import { haptic } from "../../ui/motion";
 
 const STEPS = ["Servicios", "Profesional", "Fecha y hora", "Preferencias", "Revisión"];
 
@@ -71,6 +72,7 @@ export function Booking({ query }: { query: URLSearchParams }) {
     });
     setBusy(false);
     if (!r.ok) {
+      haptic("warning");
       setError(r.message);
       setTime(null);
       setStep(2);
@@ -86,6 +88,7 @@ export function Booking({ query }: { query: URLSearchParams }) {
       });
     else if (refPhoto)
       be.savePreparation(actor, r.appointment.id, { mode: "subir_referencia", referencePhotoId: refPhoto.id, keep: "", change: "", note: "Referencia elegida en Explorar." });
+    haptic("success");
     navigate(`/cliente/cita/${r.appointment.id}?nueva=1`);
   };
 

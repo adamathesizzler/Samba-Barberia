@@ -1,7 +1,9 @@
 // Home del cliente: contexto, no un dashboard (apartado 43). Lenguaje visual R13: saludo con avatar,
 // accesos por categoría y la próxima cita como tarjeta fotográfica con controles de cristal.
 
+import { useState } from "react";
 import { navigate } from "../../app/router";
+import { useTilt } from "../../ui/motion";
 import { useStore } from "../../app/store";
 import { customerSessions, loyaltyProgress, upcomingAppointments, visitRhythm } from "../../domain/queries";
 import { datePart, daysBetween, formatDay, formatRelativeDay, timePart } from "../../domain/time";
@@ -30,9 +32,10 @@ function NextAppointmentCard({ appt }: { appt: Appointment }) {
   const customer = state.customers.find((c) => c.id === appt.customerId)!;
   const isToday = datePart(appt.start) === datePart(now);
   const arrived = appt.status === "llegada" || appt.status === "en_atencion";
+  const tilt = useTilt<HTMLElement>(4);
 
   return (
-    <article className="photo-card" aria-label="Próxima cita">
+    <article className="photo-card" aria-label="Próxima cita" ref={tilt}>
       <PhotoArt hue={photo?.hue ?? customer.hue} view={photo?.view ?? "lateral_der"} label={photo ? "Tu referencia · demo" : "Foto demo"} />
       <div className="top">
         <span className="chip-glass">
@@ -65,7 +68,7 @@ function NextAppointmentCard({ appt }: { appt: Appointment }) {
           <div className="label">Reserva</div>
         </div>
       </div>
-      <div className="bottom">
+      <div className="pc-bottom">
         <span className="small" style={{ opacity: 0.85, fontWeight: 600 }}>
           Próxima cita
         </span>
@@ -92,6 +95,16 @@ function NextAppointmentCard({ appt }: { appt: Appointment }) {
 
 export function Home() {
   const { state, actor, now } = useStore();
+  const [firstVisit] = useState(() => {
+    // La entrada escalonada solo la primera vez por sesión: Inicio se ve muchas veces al día.
+    try {
+      if (sessionStorage.getItem("samba.home.seen")) return false;
+      sessionStorage.setItem("samba.home.seen", "1");
+    } catch {
+      return false;
+    }
+    return true;
+  });
   if (actor.kind !== "cliente") return null;
   const me = state.customers.find((c) => c.id === actor.customerId)!;
   const next = upcomingAppointments(state, me.id, now)[0];
@@ -111,7 +124,7 @@ export function Home() {
   const categories = CATEGORIES.map((c) => ({ ...c, service: state.services.find((s) => s.businessId === homeBiz && s.active && s.category === c.cat) })).filter((c) => c.service);
 
   return (
-    <div className="page">
+    <div className={`page ${firstVisit ? "stagger" : ""}`}>
       <header className="home-head">
         <button style={{ all: "unset", cursor: "pointer" }} onClick={() => navigate("/cliente/perfil")} aria-label="Ir a tu perfil">
           <Avatar name={me.name} hue={me.hue} />

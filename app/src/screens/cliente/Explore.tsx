@@ -52,7 +52,7 @@ export function Explore() {
       ) : (
         <div className="grid-photos">
           {photos.map((p) => (
-            <button key={p.id} onClick={() => navigate(`/cliente/explorar/${p.id}`)} aria-label="Ver trabajo">
+            <button key={p.id} onClick={(e) => navigate(`/cliente/explorar/${p.id}`, e.currentTarget.querySelector<HTMLElement>(".photo"))} aria-label="Ver trabajo">
               <PhotoArt hue={p.hue} view={p.view} label={null} style={{ width: "100%", height: "100%" }} />
             </button>
           ))}
@@ -86,7 +86,7 @@ export function ExploreDetail({ photoId }: { photoId: string }) {
   return (
     <div className="page">
       <PageHeader title="Trabajo" backTo="/cliente/explorar" />
-      <PhotoArt hue={photo.hue} view={photo.view} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-xl)" }} />
+      <PhotoArt hue={photo.hue} view={photo.view} style={{ aspectRatio: "4 / 5", borderRadius: "var(--r-xl)", viewTransitionName: "foto" }} />
       <div className="stack tight">
         <h2 style={{ fontSize: "var(--fs-xl)" }}>{current.map((s) => s.name).join(" + ")}</h2>
         <span className="muted small">

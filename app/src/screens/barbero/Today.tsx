@@ -9,6 +9,7 @@ import type { Appointment } from "../../domain/types";
 import { Icon } from "../../ui/Icon";
 import { Empty, Notice, PageHeader, SimBadge, StatusBadge, statusLabel } from "../../ui/common";
 import { capitalize } from "../../ui/product";
+import { haptic } from "../../ui/motion";
 
 function useStaff() {
   const { state, actor } = useStore();
@@ -135,6 +136,7 @@ export function Scan() {
 
   const run = (ref: { token: string } | { appointmentId: string }) => {
     const r = be.checkIn(actor, ref);
+    haptic(r.ok && r.status === "registrado" ? "success" : r.ok ? "light" : "warning");
     if (r.ok)
       setResult(
         r.status === "registrado"

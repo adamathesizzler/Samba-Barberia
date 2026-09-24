@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, type ReactNode } from "react";
 import { back } from "../app/router";
 import type { AppointmentStatus, Photo, PhotoView } from "../domain/types";
 import { Icon, type IconName } from "./Icon";
@@ -154,7 +154,7 @@ export function ProgressBar({ value, max, label }: { value: number; max: number;
     return (
       <div className="progress segments" role="progressbar" aria-valuemin={0} aria-valuemax={max} aria-valuenow={value} aria-label={label}>
         {Array.from({ length: max }, (_, i) => (
-          <span key={i} className={i < value ? "on" : ""} />
+          <span key={i} className={i < value ? "on" : ""} style={{ ["--i" as string]: i }} />
         ))}
       </div>
     );
@@ -199,15 +199,81 @@ export function PageHeader({ title, backTo, action }: { title: string; backTo?: 
   );
 }
 
+/**
+ * Hoja inferior arrastrable. Sigue al dedo 1:1 desde donde se agarra, resiste hacia arriba
+ * (rubber-band), se cierra con un gesto rápido aunque no se haya arrastrado mucho y sale por
+ * el mismo camino por el que entró.
+ */
 export function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ y0: number; t0: number; dy: number; id: number } | null>(null);
+  const closing = useRef(false);
+
+  const close = () => {
+    if (closing.current) return;
+    closing.current = true;
+    const el = sheetRef.current;
+    const bd = backdropRef.current;
+    if (!el || !bd) return onClose();
+    el.style.transition = "transform 240ms var(--ease-drawer)";
+    el.style.transform = "translateY(100%)";
+    bd.style.transition = "opacity 240ms ease";
+    bd.style.opacity = "0";
+    window.setTimeout(onClose, 230);
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const onDown = (e: React.PointerEvent) => {
+    // Solo se arrastra desde la zona superior (asa y título) para no pelear con el scroll.
+    if (drag.current) return;
+    e.preventDefault();
+    const el = sheetRef.current!;
+    el.setPointerCapture(e.pointerId);
+    el.style.transition = "none";
+    drag.current = { y0: e.clientY, t0: performance.now(), dy: 0, id: e.pointerId };
+  };
+  const onMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    const raw = e.clientY - d.y0;
+    const h = sheetRef.current!.offsetHeight;
+    // Hacia arriba: resistencia progresiva en lugar de un tope seco.
+    d.dy = raw >= 0 ? raw : -((-raw * h * 0.55) / (h + 0.55 * -raw));
+    sheetRef.current!.style.transform = `translateY(${d.dy}px)`;
+    backdropRef.current!.style.opacity = String(Math.max(0, 1 - Math.max(0, d.dy) / h));
+  };
+  const onUp = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    drag.current = null;
+    const el = sheetRef.current!;
+    const velocity = d.dy / Math.max(1, performance.now() - d.t0);
+    if (d.dy > el.offsetHeight * 0.3 || velocity > 0.11) close();
+    else {
+      el.style.transition = "transform 320ms var(--ease-drawer)";
+      el.style.transform = "translateY(0)";
+      backdropRef.current!.style.transition = "opacity 200ms ease";
+      backdropRef.current!.style.opacity = "1";
+    }
+  };
+
   return (
-    <div className="sheet-backdrop" onClick={onClose}>
-      <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
-        <div className="row between">
-          <h2 style={{ fontSize: "var(--fs-lg)" }}>{title}</h2>
-          <button className="icon-btn" onClick={onClose} aria-label="Cerrar">
-            <Icon name="x" />
-          </button>
+    <div className="sheet-backdrop" ref={backdropRef} onClick={close}>
+      <div className="sheet" ref={sheetRef} role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
+        <div className="sheet-grab" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
+          <span className="grabber" aria-hidden="true" />
+          <div className="row between">
+            <h2 style={{ fontSize: "var(--fs-lg)" }}>{title}</h2>
+            <button className="icon-btn" onPointerDown={(e) => e.stopPropagation()} onClick={close} aria-label="Cerrar">
+              <Icon name="x" />
+            </button>
+          </div>
         </div>
         {children}
       </div>
@@ -221,5 +287,56 @@ export function Switch({ checked, onChange, label }: { checked: boolean; onChang
       <span className="grow">{label}</span>
       <button type="button" role="switch" aria-checked={checked} aria-label={label} className="switch" onClick={() => onChange(!checked)} />
     </label>
+  );
+}
+
+/**
+ * Control segmentado con indicador que se desliza entre opciones (transform, interrumpible).
+ * El estado se comunica también con aria-selected, no solo con el relieve.
+ */
+export function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
+  role = "tablist",
+}: {
+  options: { key: T; label: ReactNode; aria?: string }[];
+  value: T;
+  onChange: (v: T) => void;
+  label: string;
+  role?: "tablist" | "radiogroup";
+}) {
+  const wrap = useRef<HTMLDivElement>(null);
+  const pill = useRef<HTMLSpanElement>(null);
+  const first = useRef(true);
+  useLayoutEffect(() => {
+    const w = wrap.current;
+    const p = pill.current;
+    const btn = w?.querySelector<HTMLButtonElement>(`[data-key="${CSS.escape(value)}"]`);
+    if (!w || !p || !btn) return;
+    // La primera colocación no se anima; las siguientes sí.
+    p.style.transition = first.current ? "none" : "";
+    p.style.width = `${btn.offsetWidth}px`;
+    p.style.transform = `translateX(${btn.offsetLeft - 4}px)`;
+    first.current = false;
+  }, [value, options.length]);
+  return (
+    <div className="segmented" role={role} aria-label={label} ref={wrap}>
+      <span className="seg-pill" ref={pill} aria-hidden="true" />
+      {options.map((o) => (
+        <button
+          key={o.key}
+          data-key={o.key}
+          role={role === "tablist" ? "tab" : "radio"}
+          aria-selected={role === "tablist" ? value === o.key : undefined}
+          aria-checked={role === "radiogroup" ? value === o.key : undefined}
+          aria-label={o.aria}
+          onClick={() => onChange(o.key)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
   );
 }

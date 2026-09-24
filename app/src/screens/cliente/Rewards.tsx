@@ -6,7 +6,7 @@ import { useStore } from "../../app/store";
 import { achievementsFor, loyaltyProgress, spendingSummary } from "../../domain/queries";
 import { formatDay, formatMoney, timePart } from "../../domain/time";
 import { Icon } from "../../ui/Icon";
-import { Empty, Notice, PageHeader, SimBadge } from "../../ui/common";
+import { Empty, Notice, PageHeader, Segmented, SimBadge } from "../../ui/common";
 import { AchievementCard, LoyaltyBlock, RewardCard, capitalize } from "../../ui/product";
 
 export function Rewards() {
@@ -42,13 +42,16 @@ export function Rewards() {
 
       <section className="section">
         <div className="section-title">Monedero</div>
-        <div className="segmented" role="tablist">
-          {(["disponible", "utilizada", "caducada"] as const).map((t) => (
-            <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
-              {{ disponible: "Disponibles", utilizada: "Utilizadas", caducada: "Caducadas" }[t]}
-            </button>
-          ))}
-        </div>
+        <Segmented
+          label="Monedero"
+          value={tab}
+          onChange={setTab}
+          options={[
+            { key: "disponible", label: "Disponibles" },
+            { key: "utilizada", label: "Utilizadas" },
+            { key: "caducada", label: "Caducadas" },
+          ]}
+        />
         {shown.length === 0 ? (
           <Empty icon="gift" title={tab === "disponible" ? "No tienes recompensas disponibles" : "Nada por aquí"}>
             {tab === "disponible" && loyalty ? `Te faltan ${loyalty.remaining} visitas para la siguiente.` : undefined}
@@ -69,15 +72,12 @@ export function Activity() {
   return (
     <div className="page">
       <PageHeader title="Mi actividad" backTo="/cliente/perfil" />
-      <div className="segmented" role="tablist">
-        {[year - 1, year, year + 1]
-          .filter((y) => y <= Number(now.slice(0, 4)))
-          .map((y) => (
-            <button key={y} role="tab" aria-selected={y === year} onClick={() => setYear(y)}>
-              {y}
-            </button>
-          ))}
-      </div>
+      <Segmented
+        label="Año"
+        value={String(year)}
+        onChange={(y) => setYear(Number(y))}
+        options={[year - 1, year, year + 1].filter((y) => y <= Number(now.slice(0, 4))).map((y) => ({ key: String(y), label: y }))}
+      />
       {s.visits === 0 ? (
         <Empty icon="euro" title={`Sin visitas en ${year}`} />
       ) : (

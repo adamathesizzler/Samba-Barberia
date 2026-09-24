@@ -1371,7 +1371,7 @@ body {
   gap: var(--s3);
 }
 
-.photo-card .bottom {
+.photo-card .pc-bottom {
   position: absolute;
   left: var(--s5);
   right: 76px;
@@ -1729,4 +1729,552 @@ body {
   inset: 0 0 55% 0;
   background: linear-gradient(180deg, rgba(12, 10, 9, 0.35), transparent);
   z-index: -1;
+}
+
+/* =========================================================
+   Oficio de interacción (Emil Kowalski · Apple fluid interfaces)
+   - Respuesta al pulsar, no al soltar. Presión rápida, suelta con muelle.
+   - Solo transform y opacity. Transiciones (interrumpibles) para estados.
+   - Continuidad espacial: adelante entra por la derecha, atrás vuelve por el mismo camino.
+   - Materiales con luz en el borde superior y sombra en dos capas.
+   ========================================================= */
+
+html {
+  font-optical-sizing: auto;
+}
+
+.xs {
+  letter-spacing: 0.01em;
+}
+
+/* ---------- presión: todo lo pulsable responde al instante ---------- */
+
+.btn,
+.chip,
+.icon-btn,
+.glass-round,
+.glass-pill,
+.day,
+.slot,
+.card.clickable,
+.grid-photos > button,
+.cat,
+.fab {
+  transition:
+    transform 420ms var(--ease-spring),
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 200ms var(--ease-out),
+    opacity 160ms ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.btn:active:not(:disabled),
+.chip:active:not(:disabled),
+.icon-btn:active,
+.glass-round:active,
+.glass-pill:active,
+.day:active,
+.slot:active:not(:disabled),
+.grid-photos > button:active {
+  transform: scale(0.96);
+  transition-duration: 100ms;
+  transition-timing-function: var(--ease-out);
+}
+
+.card.clickable:active {
+  transform: scale(0.985);
+  transition-duration: 100ms;
+  transition-timing-function: var(--ease-out);
+}
+
+.cat .tile {
+  transition: transform 420ms var(--ease-spring);
+}
+
+.cat:active .tile {
+  transform: scale(0.9);
+  transition: transform 100ms var(--ease-out);
+}
+
+.list-item {
+  transition: background-color 160ms ease;
+}
+
+.list-item:active {
+  background: var(--surface-2);
+}
+
+.nav a svg {
+  transition: transform 420ms var(--ease-spring);
+}
+
+.nav a:active svg {
+  transform: scale(0.86);
+  transition-duration: 100ms;
+}
+
+/* hover solo con puntero fino: en táctil el hover es un falso positivo */
+@media (hover: hover) and (pointer: fine) {
+  .card.clickable:hover {
+    box-shadow: var(--shadow-2);
+    transform: translateY(-2px);
+  }
+  .grid-photos > button .photo svg {
+    transition: transform 600ms var(--ease-out);
+  }
+  .grid-photos > button:hover .photo svg {
+    transform: scale(1.05);
+  }
+  .btn.primary:hover {
+    box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--selected) 60%, transparent);
+  }
+}
+
+/* ---------- materiales y profundidad ---------- */
+
+.card {
+  box-shadow:
+    inset 0 1px 0 var(--highlight),
+    0 1px 2px rgba(20, 18, 15, 0.04),
+    0 6px 20px -8px rgba(20, 18, 15, 0.12);
+}
+
+.card.flat,
+.card.tinted {
+  box-shadow: inset 0 1px 0 var(--highlight);
+}
+
+.btn.primary {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 2px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+.nav.glass {
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--highlight),
+    0 1px 1px rgba(0, 0, 0, 0.04),
+    0 16px 40px -14px rgba(20, 18, 15, 0.35);
+}
+
+/* Borde de desplazamiento: el contenido se desvanece bajo la barra en vez de cortarse */
+.bottom::before {
+  content: "";
+  position: absolute;
+  inset: -40px 0 0 0;
+  background: linear-gradient(to top, var(--bg) 35%, color-mix(in srgb, var(--bg) 0%, transparent));
+  z-index: -1;
+  pointer-events: none;
+}
+
+.bottom {
+  isolation: isolate;
+}
+
+/* Pastilla deslizante bajo la pestaña activa */
+.nav {
+  position: relative;
+}
+
+.nav a {
+  position: relative;
+  z-index: 1;
+}
+
+.nav a[aria-current="page"],
+.nav.orbnav a[aria-current="page"]:not(.orb) {
+  background: none;
+}
+
+.nav.orbnav a[aria-current="page"]:not(.orb)::after {
+  display: none;
+}
+
+.nav-pill {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  box-shadow: inset 0 1px 0 var(--highlight);
+  transition:
+    transform 420ms var(--ease-drawer),
+    width 420ms var(--ease-drawer),
+    opacity 200ms ease;
+  will-change: transform;
+}
+
+.nav.pronav .nav-pill {
+  background: var(--selected);
+}
+
+.nav.pronav a[aria-current="page"] {
+  color: var(--on-selected);
+  transition: color 200ms ease 80ms;
+}
+
+.nav.orbnav a[aria-current="page"]:not(.orb) {
+  color: var(--text);
+}
+
+/* La esfera: se hunde al pulsar y vuelve con un leve rebote */
+.orb {
+  transition: transform 520ms var(--ease-spring), box-shadow 200ms ease;
+}
+
+.orb:active {
+  transform: scale(0.9);
+  transition: transform 90ms var(--ease-out);
+}
+
+.orb svg {
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+/* Control segmentado con indicador que se desliza */
+.segmented {
+  position: relative;
+}
+
+.segmented button {
+  position: relative;
+  z-index: 1;
+  transition: color 220ms ease;
+}
+
+.segmented button[aria-selected="true"],
+.segmented button[aria-checked="true"] {
+  background: none;
+  box-shadow: none;
+  color: var(--on-selected);
+}
+
+.seg-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  border-radius: var(--r-full);
+  background: var(--selected);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 4px 12px -4px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 380ms var(--ease-drawer),
+    width 380ms var(--ease-drawer);
+  will-change: transform;
+}
+
+/* Chips: el paso a seleccionado se funde, no salta */
+.chip[aria-pressed="true"],
+.chip[aria-checked="true"] {
+  transition:
+    transform 420ms var(--ease-spring),
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+/* ---------- entradas ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.page.stagger > * {
+  animation: rise 520ms var(--ease-out) both;
+}
+
+.page.stagger > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.page.stagger > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.page.stagger > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.page.stagger > *:nth-child(5) {
+  animation-delay: 200ms;
+}
+.page.stagger > *:nth-child(n + 6) {
+  animation-delay: 240ms;
+}
+
+.page.stagger .cat {
+  animation: rise 480ms var(--ease-out) both;
+}
+.page.stagger .cat:nth-child(2) {
+  animation-delay: 90ms;
+}
+.page.stagger .cat:nth-child(3) {
+  animation-delay: 120ms;
+}
+.page.stagger .cat:nth-child(4) {
+  animation-delay: 150ms;
+}
+.page.stagger .cat:nth-child(n + 5) {
+  animation-delay: 180ms;
+}
+
+@keyframes ticket-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+    filter: blur(6px);
+  }
+}
+
+.ticket {
+  animation: ticket-arrive 620ms var(--ease-drawer) both;
+}
+
+@keyframes seg-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.progress.segments > span.on {
+  transform-origin: left center;
+  animation: seg-fill 460ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 45ms + 120ms);
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.7);
+  }
+  55% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-btn[aria-pressed="true"] svg {
+  animation: pop 440ms var(--ease-out);
+}
+
+@keyframes swap {
+  from {
+    opacity: 0.5;
+    filter: blur(8px);
+    transform: scale(1.02);
+  }
+}
+
+.swap-in {
+  animation: swap 360ms var(--ease-out);
+}
+
+/* Fotos de cabecera: capa que se mueve con parallax */
+.profile-hero > .parallax,
+.fade-hero > .parallax {
+  position: absolute;
+  z-index: -2;
+  will-change: transform;
+  transform-origin: center top;
+}
+
+.profile-hero > .parallax {
+  inset: 0 0 18% 0;
+}
+
+.fade-hero > .parallax {
+  inset: 0;
+  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+}
+
+.profile-hero > .parallax > .photo,
+.fade-hero > .parallax > .photo {
+  position: absolute;
+  inset: 0;
+}
+
+.profile-hero,
+.fade-hero {
+  overflow: hidden;
+}
+
+.photo-card {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+/* ---------- hoja inferior: material que llega, se arrastra y se va por donde vino ---------- */
+
+.sheet-backdrop {
+  background: rgba(12, 10, 9, 0.38);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: fade 260ms ease both;
+}
+
+.sheet {
+  animation: sheet-rise 420ms var(--ease-drawer) both;
+  box-shadow:
+    inset 0 1px 0 var(--highlight),
+    0 -12px 40px -12px rgba(0, 0, 0, 0.3);
+  will-change: transform;
+}
+
+@keyframes sheet-rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.sheet-grab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  margin: calc(-1 * var(--s3)) calc(-1 * var(--s4)) 0;
+  padding: var(--s2) var(--s4) 0;
+  touch-action: none;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.sheet-grab:active {
+  cursor: grabbing;
+}
+
+.grabber {
+  align-self: center;
+  width: 38px;
+  height: 5px;
+  border-radius: var(--r-full);
+  background: var(--surface-3);
+}
+
+/* ---------- aviso: entra con material, sale más rápido de lo que entró ---------- */
+
+.toast {
+  animation: none;
+  transition:
+    opacity 260ms var(--ease-out),
+    transform 320ms var(--ease-out),
+    filter 260ms ease;
+}
+
+.toast.in {
+  opacity: 1;
+  transform: translateX(-50%);
+  filter: blur(0);
+}
+
+@starting-style {
+  .toast.in {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-14px) scale(0.96);
+    filter: blur(4px);
+  }
+}
+
+.toast.out {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-8px) scale(0.98);
+  transition-duration: 180ms;
+}
+
+/* ---------- transiciones entre pantallas (View Transitions) ---------- */
+
+.demo-bar {
+  view-transition-name: demobar;
+}
+
+.nav-row {
+  view-transition-name: tabbar;
+}
+
+.context-band {
+  view-transition-name: band;
+}
+
+html[data-nav] .page {
+  animation: none;
+}
+
+::view-transition-group(foto) {
+  animation-duration: 460ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+::view-transition-old(foto),
+::view-transition-new(foto) {
+  height: 100%;
+  object-fit: cover;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: ease;
+}
+
+@keyframes vt-in-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes vt-out-left {
+  to {
+    transform: translateX(-28%);
+    opacity: 0.6;
+  }
+}
+@keyframes vt-in-left {
+  from {
+    transform: translateX(-28%);
+    opacity: 0.6;
+  }
+}
+@keyframes vt-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+html[data-nav="forward"]::view-transition-new(root) {
+  animation: vt-in-right 420ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.12);
+}
+html[data-nav="forward"]::view-transition-old(root) {
+  animation: vt-out-left 420ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+html[data-nav="back"]::view-transition-old(root) {
+  animation: vt-out-right 360ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  z-index: 1;
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.12);
+}
+html[data-nav="back"]::view-transition-new(root) {
+  animation: vt-in-left 360ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* ---------- movimiento reducido: fundidos breves, sin desplazamientos ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .page.stagger > *,
+  .page.stagger .cat,
+  .ticket,
+  .sheet,
+  .progress.segments > span.on,
+  .icon-btn[aria-pressed="true"] svg {
+    animation: fade 200ms ease both !important;
+  }
+  .nav-pill,
+  .seg-pill {
+    transition: none !important;
+  }
 }

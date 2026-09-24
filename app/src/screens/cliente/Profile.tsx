@@ -7,11 +7,17 @@ import { hasPhotoPermission } from "../../domain/permissions";
 import { customerSessions, upcomingAppointments } from "../../domain/queries";
 import { formatDay } from "../../domain/time";
 import { Icon, type IconName } from "../../ui/Icon";
-import { Empty, Notice, PageHeader, PhotoArt, Switch } from "../../ui/common";
+import { Empty, Notice, PageHeader, PhotoArt, Segmented, Switch } from "../../ui/common";
 import { PreferenceChip } from "../../ui/product";
+import { useCountUp, useParallax } from "../../ui/motion";
+
+function Count({ to }: { to: number }) {
+  return <>{useCountUp(to)}</>;
+}
 
 export function Profile() {
   const { state, actor, now } = useStore();
+  const heroPhoto = useParallax<HTMLDivElement>(0.4);
   if (actor.kind !== "cliente") return null;
   const me = state.customers.find((c) => c.id === actor.customerId)!;
   const sessions = customerSessions(state, me.id);
@@ -38,11 +44,13 @@ export function Profile() {
   return (
     <div className="page">
       <section className="profile-hero" aria-label="Tu perfil">
-        {cover ? (
-          <PhotoArt hue={cover.hue} view={cover.view} label="Foto demo" />
-        ) : (
-          <div className="photo" style={{ background: `linear-gradient(160deg, hsl(${me.hue} 30% 80%), hsl(${me.hue} 25% 45%))` }} />
-        )}
+        <div className="parallax" ref={heroPhoto}>
+          {cover ? (
+            <PhotoArt hue={cover.hue} view={cover.view} label="Foto demo" />
+          ) : (
+            <div className="photo" style={{ background: `linear-gradient(160deg, hsl(${me.hue} 30% 80%), hsl(${me.hue} 25% 45%))` }} />
+          )}
+        </div>
         <div className="hero-actions">
           <a className="glass-round" href="#/cliente/ajustes" aria-label="Ajustes">
             <Icon name="settings" />
@@ -74,15 +82,21 @@ export function Profile() {
           </div>
           <div className="profile-stats">
             <div className="stat">
-              <b>{sessions.length}</b>
+              <b>
+                <Count to={sessions.length} />
+              </b>
               <span>visitas</span>
             </div>
             <div className="stat">
-              <b>{entries.filter((e) => e.coverPhotoId).length}</b>
+              <b>
+                <Count to={entries.filter((e) => e.coverPhotoId).length} />
+              </b>
               <span>estilos</span>
             </div>
             <div className="stat">
-              <b>{rewards.length}</b>
+              <b>
+                <Count to={rewards.length} />
+              </b>
               <span>recompensas</span>
             </div>
           </div>
@@ -111,7 +125,7 @@ export function Profile() {
               .reverse()
               .slice(0, 9)
               .map((p) => (
-                <button key={p.id} aria-label="Abrir visita" onClick={() => navigate(`/cliente/visita/${p.sessionId}`)}>
+                <button key={p.id} aria-label="Abrir visita" onClick={(e) => navigate(`/cliente/visita/${p.sessionId}`, e.currentTarget.querySelector<HTMLElement>(".photo"))}>
                   <PhotoArt hue={p.hue} view={p.view} label={null} style={{ width: "100%", height: "100%" }} />
                 </button>
               ))}
@@ -222,13 +236,17 @@ export function Settings() {
       <PageHeader title="Ajustes" backTo="/cliente/perfil" />
       <section className="section">
         <div className="section-title">Tema</div>
-        <div className="segmented" role="tablist">
-          {(["system", "light", "dark"] as const).map((t) => (
-            <button key={t} role="tab" aria-selected={theme === t} onClick={() => setTheme(t)}>
-              {{ system: "Sistema", light: "Claro", dark: "Oscuro" }[t]}
-            </button>
-          ))}
-        </div>
+        <Segmented
+          label="Tema"
+          role="radiogroup"
+          value={theme}
+          onChange={setTheme}
+          options={[
+            { key: "system", label: "Sistema" },
+            { key: "light", label: "Claro" },
+            { key: "dark", label: "Oscuro" },
+          ]}
+        />
       </section>
       <button className="btn outline block" onClick={() => navigate("/cliente/bienvenida")}>
         Ver la bienvenida

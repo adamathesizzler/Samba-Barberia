@@ -115,3 +115,21 @@ Aportadas por el promotor como inspiración para adaptar, no para copiar.
 ### Fotos de demostración
 
 `PhotoArt` pasa a dibujar retratos de estudio en silueta (luz suave, borde iluminado, perfil o frente, tres tipos de corte) con más contraste de color. Siguen etiquetados «Foto demo»; en cabeceras la etiqueta va arriba para no tapar el contenido.
+
+## Movimiento e interacción (24/09/2026)
+
+Criterios de Emil Kowalski (design engineering) y de *Designing Fluid Interfaces* de Apple, aplicados en `app/src/ui/motion.ts`, `app/src/app/router.ts` y el bloque «Oficio de interacción» de `app.css`.
+
+| Principio | Cómo se aplica |
+|---|---|
+| Respuesta al pulsar, no al soltar | Todo lo pulsable se hunde a `scale(0.96)` en 100 ms y vuelve con un leve muelle (`--ease-spring`, 420 ms): presión rápida, suelta con cuerpo |
+| Curvas con carácter | `--ease-out` (0.23, 1, 0.32, 1) para respuestas; `--ease-drawer` (0.32, 0.72, 0, 1) para hojas y pantallas; nunca `ease-in` |
+| Continuidad espacial | Adelante: la pantalla nueva entra por la derecha y la anterior retrocede un 28 % y se oscurece. Atrás: vuelve por el mismo camino. Entre pestañas: fundido. La barra inferior y la de demostración no se mueven (View Transitions API; sin soporte, entrada suave de respaldo) |
+| Elemento compartido | La foto que tocas en Perfil, Mi estilo o Explorar se expande hasta la foto grande del detalle |
+| Manipulación directa | La hoja inferior sigue al dedo 1:1, resiste hacia arriba (rubber-band) y se cierra con un gesto rápido (velocidad > 0,11 px/ms) aunque recorra poca distancia. Sale por donde entró |
+| Indicadores que se deslizan | Pestañas, pestaña activa de la barra inferior y controles segmentados: una pastilla se desplaza con `transform` (interrumpible), en lugar de saltar |
+| Profundidad | Cabeceras de Perfil e Historial con parallax y ampliación al estirar; tarjeta de la próxima cita con inclinación 3D sutil que sigue al ratón con inercia (solo con puntero fino); materiales con luz en el borde superior y sombra en dos capas; el contenido se desvanece bajo la barra inferior |
+| Detalle en momentos poco frecuentes | Entrada escalonada de Inicio solo la primera vez por sesión; cifras del perfil que cuentan hasta su valor; segmentos del premio que se llenan uno tras otro; corazón con «pop» al marcar favorito; ticket que llega con material (desenfoque → nítido) |
+| Aviso (toast) | Entra con desenfoque y escala; sale más rápido de lo que entró |
+| Háptica con significado | Vibración breve en reserva confirmada, llegada registrada, sesión cerrada y errores. Nunca en navegación normal |
+| Accesibilidad | Con «reducir movimiento»: sin transiciones de pantalla, parallax ni inclinación; las entradas pasan a fundidos de 200 ms. Con «reducir transparencia», el cristal es opaco |

@@ -142,12 +142,12 @@ export function CheckInQR({ token }: { token: string }) {
   return <div className="qr-box" role="img" aria-label="Código QR de la reserva" dangerouslySetInnerHTML={{ __html: svg }} />;
 }
 
-export function StyleCard({ entry, onClick }: { entry: StyleEntry; onClick: () => void }) {
+export function StyleCard({ entry, onClick }: { entry: StyleEntry; onClick: (photo: HTMLElement | null) => void }) {
   const { state } = useStore();
   const photo = entry.coverPhotoId ? state.photos.find((p) => p.id === entry.coverPhotoId) : undefined;
   const session = state.sessions.find((s) => s.id === entry.sessionId);
   return (
-    <button onClick={onClick} className="card clickable flat" style={{ padding: 0, overflow: "hidden" }} aria-label={entry.title}>
+    <button onClick={(e) => onClick(e.currentTarget.querySelector<HTMLElement>(".photo"))} className="card clickable flat" style={{ padding: 0, overflow: "hidden" }} aria-label={entry.title}>
       {photo ? (
         <PhotoArt hue={photo.hue} view={photo.view} source={photo.source} style={{ aspectRatio: "4 / 5" }} />
       ) : (

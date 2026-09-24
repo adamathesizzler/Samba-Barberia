@@ -9,7 +9,8 @@ import { customerSessions } from "../../domain/queries";
 import { formatMoney } from "../../domain/time";
 import type { PhotoView, Reward, Session } from "../../domain/types";
 import { Icon } from "../../ui/Icon";
-import { Empty, Notice, PageHeader, PhotoArt, SimBadge } from "../../ui/common";
+import { Empty, Notice, PageHeader, PhotoArt, Segmented, SimBadge } from "../../ui/common";
+import { haptic } from "../../ui/motion";
 
 const VIEWS: { key: PhotoView; label: string }[] = [
   { key: "frontal", label: "Frontal" },
@@ -153,6 +154,7 @@ export function CloseSession({ id }: { id: string }) {
     } catch {
       /* nada */
     }
+    haptic("success");
     setDone({ session: r.session, duplicated: r.duplicated, rewards: r.newRewards });
   };
 
@@ -300,14 +302,16 @@ export function CloseSession({ id }: { id: string }) {
 
       <section className="section">
         <div className="section-title">5 · Pago</div>
-        <div className="segmented" role="radiogroup">
-          <button role="radio" aria-selected={draft.payment === "registrado_en_local"} onClick={() => set("payment", "registrado_en_local")}>
-            Pagado en el local
-          </button>
-          <button role="radio" aria-selected={draft.payment === "pendiente"} onClick={() => set("payment", "pendiente")}>
-            Pendiente
-          </button>
-        </div>
+        <Segmented
+          label="Pago"
+          role="radiogroup"
+          value={draft.payment}
+          onChange={(v) => set("payment", v)}
+          options={[
+            { key: "registrado_en_local", label: "Pagado en el local" },
+            { key: "pendiente", label: "Pendiente" },
+          ]}
+        />
         <span className="xs muted">Cerrar el servicio y cobrar son cosas distintas. La app no procesa pagos.</span>
       </section>
 

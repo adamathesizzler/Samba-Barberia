@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { navigate, useRoute } from "./app/router";
 import { ROLES, useStore, type RoleKey } from "./app/store";
 import { datePart, formatDay, timePart } from "./domain/time";
@@ -38,6 +38,42 @@ export function useTheme() {
     }
   }, [theme]);
   return [theme, setTheme] as const;
+}
+
+
+/** Coloca una pastilla bajo el enlace activo y la desliza al cambiar de pestaña. */
+function useNavPill(current: string) {
+  const nav = useRef<HTMLDivElement>(null);
+  const pill = useRef<HTMLSpanElement>(null);
+  const first = useRef(true);
+  useLayoutEffect(() => {
+    const a = nav.current?.querySelector<HTMLElement>('a[aria-current="page"]');
+    const p = pill.current;
+    if (!p) return;
+    if (!a) {
+      p.style.opacity = "0";
+      return;
+    }
+    p.style.transition = first.current ? "none" : "";
+    p.style.opacity = "1";
+    p.style.width = `${a.offsetWidth}px`;
+    p.style.transform = `translateX(${a.offsetLeft}px)`;
+    first.current = false;
+  }, [current]);
+  return { nav, pill };
+}
+
+function Toast({ msg }: { msg: string | null }) {
+  const [text, setText] = useState(msg);
+  useEffect(() => {
+    if (msg) setText(msg);
+  }, [msg]);
+  if (!text) return null;
+  return (
+    <div className={`toast ${msg ? "in" : "out"}`} role="status" onTransitionEnd={() => !msg && setText(null)}>
+      {text}
+    </div>
+  );
 }
 
 function DemoBar() {
@@ -97,6 +133,7 @@ function DemoBar() {
 
 function ClientNav({ current }: { current: string }) {
   const { state, actor, now } = useStore();
+  const { nav, pill } = useNavPill(current);
   const items: { key: string; label: string; icon: IconName }[] = [
     { key: "inicio", label: "Inicio", icon: "home" },
     { key: "explorar", label: "Explorar", icon: "compass" },
@@ -128,7 +165,8 @@ function ClientNav({ current }: { current: string }) {
         </div>
       )}
       <div className="nav-row">
-        <div className="nav glass orbnav">
+        <div className="nav glass orbnav" ref={nav}>
+          <span className="nav-pill" ref={pill} aria-hidden="true" />
           {items.map((it, i) => (
             <Fragment key={it.key}>
               {i === 2 && (
@@ -152,6 +190,7 @@ function ClientNav({ current }: { current: string }) {
 
 function ProNav({ current }: { current: string }) {
   const { actor } = useStore();
+  const { nav, pill } = useNavPill(current);
   const owner = actor.kind === "staff" && actor.role === "propietario";
   const items: { key: string; label: string; icon: IconName; href: string }[] = [
     { key: "hoy", label: owner ? "Agenda" : "Hoy", icon: "calendar", href: "#/pro/hoy" },
@@ -163,7 +202,8 @@ function ProNav({ current }: { current: string }) {
   return (
     <nav className="bottom" aria-label="Navegación del profesional">
       <div className="nav-row">
-        <div className="nav glass">
+        <div className="nav glass pronav" ref={nav}>
+          <span className="nav-pill" ref={pill} aria-hidden="true" />
           {items.map((it) => (
             <a key={it.key} href={it.href} aria-current={current === it.key ? "page" : undefined}>
               <Icon name={it.icon} size={20} />
@@ -188,6 +228,19 @@ export default function App() {
     // La primera vez que entra un cliente ve la bienvenida.
     if (!allowed) navigate(role === "cliente" && !welcomeSeen() ? "/cliente/bienvenida" : ROLES[role].home);
   }, [area, expected, role]);
+
+  // Los enlaces internos pasan por navigate() para tener transición de vista.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const a = (e.target as Element).closest?.('a[href^="#/"]');
+      if (!a) return;
+      e.preventDefault();
+      navigate(a.getAttribute("href")!.slice(1));
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
 
   let content: React.ReactNode = null;
   if (area === "cliente" && actor.kind === "cliente") {
@@ -231,11 +284,7 @@ export default function App() {
       <main key={`${area}/${screen}/${id ?? ""}`}>{content}</main>
       {area === "cliente" && actor.kind === "cliente" && <ClientNav current={screen || "inicio"} />}
       {(area === "pro" || area === "gestion") && actor.kind === "staff" && <ProNav current={area === "gestion" ? "gestion" : screen || "hoy"} />}
-      {toastMsg && (
-        <div className="toast" role="status">
-          {toastMsg}
-        </div>
-      )}
+      <Toast msg={toastMsg} />
     </div>
   );
 }
